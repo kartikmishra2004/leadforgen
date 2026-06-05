@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Bot, Check, Menu, Sparkles, Star, X, Zap } from "lucide-react";
+import { ArrowRight, Bot, Check, Menu, Sparkles, Star, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
@@ -9,6 +9,7 @@ import {
 
 const dashboardHero = "/assets/dashboard-hero.png";
 const aiVisual = "/assets/ai-visual.jpg";
+const logo = "/assets/logo.png";
 const websiteBuilder = "/assets/website-builder.jpg";
 
 const Container = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
@@ -49,10 +50,7 @@ function Nav() {
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <Container className="flex h-16 items-center justify-between">
         <a href="#" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-md gradient-brand-bg shadow-glow">
-            <Zap className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <span className="text-lg font-bold tracking-tight">LeadForGen</span>
+          <img src={logo} alt="LeadForGen" width={40} height={40} className="h-10 w-10 object-contain" />
         </a>
         <nav className="hidden items-center gap-8 md:flex">
           {links.map((link) => (
@@ -117,19 +115,19 @@ function Hero() {
             Capture leads, book appointments, send quotes, manage customers, and automate with AI - all in one premium platform built for modern service businesses.
           </p>
 
-          <form onSubmit={(e) => e.preventDefault()} className="mx-auto mt-9 flex w-full max-w-xl flex-col items-stretch gap-2 rounded-full border border-border bg-card/80 p-1.5 shadow-soft backdrop-blur-md sm:flex-row sm:items-center">
+          <form onSubmit={(e) => e.preventDefault()} className="mx-auto mt-9 flex w-full max-w-xl flex-col items-stretch gap-2 rounded-2xl border border-border bg-card/80 p-2 shadow-soft backdrop-blur-md sm:flex-row sm:items-center sm:rounded-full sm:p-1.5">
             <input
               type="email"
               placeholder="Enter your work email"
-              className="min-w-0 flex-1 rounded-full bg-transparent px-5 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+              className="min-w-0 flex-1 rounded-xl bg-transparent px-4 py-2.5 text-center text-sm text-foreground placeholder:text-muted-foreground focus:outline-none sm:rounded-full sm:px-5 sm:py-3 sm:text-left"
             />
-            <button type="submit" className="group inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full gradient-brand-bg px-6 text-sm font-semibold text-primary-foreground shadow-glow transition-transform hover:scale-[1.02]">
+            <button type="submit" className="group inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full gradient-brand-bg px-6 text-sm font-semibold text-primary-foreground shadow-glow transition-transform hover:scale-[1.02] sm:h-11">
               Request a Demo
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </button>
           </form>
 
-          <p className="mt-3 text-xs text-muted-foreground">14-day free trial - No credit card required - Cancel anytime</p>
+          <p className="mx-auto mt-3 max-w-xs text-balance text-xs leading-5 text-muted-foreground sm:max-w-none">14-day free trial - No credit card required - Cancel anytime</p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
             {trust.map((item) => (
@@ -744,9 +742,7 @@ function Footer() {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-md gradient-brand-bg shadow-glow">
-                <Zap className="h-5 w-5 text-primary-foreground" />
-              </div>
+              <img src={logo} alt="LeadForGen" width={36} height={36} className="h-9 w-9 object-contain" />
               <span className="text-lg font-bold">LeadForGen</span>
             </div>
             <p className="mt-4 max-w-sm text-sm text-muted-foreground">
