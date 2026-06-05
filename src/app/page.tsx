@@ -1,7 +1,5 @@
+import { LandingPage } from "@/components/landing/LandingPage";
+
 export default function Home() {
-  return (
-    <main>
-      <h1>Leadforgen</h1>
-    </main>
-  );
+  return <LandingPage />;
 }
