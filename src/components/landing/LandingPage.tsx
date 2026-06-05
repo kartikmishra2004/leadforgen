@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Bot, Check, Menu, Play, Sparkles, Star, X, Zap } from "lucide-react";
+import { ArrowRight, Bot, Check, Menu, Sparkles, Star, X, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
@@ -141,12 +141,7 @@ function Hero() {
           </div>
         </div>
 
-        <div className="relative mx-auto mt-16 max-w-6xl">
-          <div className="absolute -inset-4 rounded-md gradient-brand-bg opacity-30 blur-3xl" />
-          <div className="relative overflow-hidden rounded-md border border-border bg-card shadow-glow">
-            <img src={dashboardHero} alt="LeadForGen dashboard" width={1920} height={1080} className="w-full" />
-          </div>
-        </div>
+        <img src={dashboardHero} alt="LeadForGen dashboard" width={1920} height={1080} className="mx-auto mt-16 w-full max-w-6xl" />
       </Container>
     </section>
   );
@@ -166,7 +161,7 @@ function Problem() {
     <section className="relative overflow-hidden py-24">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
       <Container>
-        <div className="grid items-end gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="grid items-start gap-12 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <SectionLabel>The problem</SectionLabel>
             <h2 className="mt-6 max-w-2xl text-4xl font-bold sm:text-5xl">
@@ -255,10 +250,7 @@ function HowItWorks() {
                     {index + 1}
                   </div>
                   <div className="rounded-md border border-border bg-card/80 p-5 shadow-card transition-transform hover:-translate-y-0.5">
-                    <div className="flex items-center justify-between gap-4">
-                      <h3 className="text-lg font-bold">{title}</h3>
-                      <ArrowRight className="h-4 w-4 text-primary" />
-                    </div>
+                    <h3 className="text-lg font-bold">{title}</h3>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">{detail}</p>
                   </div>
                 </div>
@@ -392,18 +384,16 @@ function Dashboard() {
         <div className="grid gap-10 lg:grid-cols-[0.72fr_0.28fr] lg:items-center">
           <div>
             <div className="max-w-3xl text-white">
-              <SectionLabel>Unified dashboard</SectionLabel>
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white backdrop-blur">
+                <Sparkles className="h-3.5 w-3.5" />
+                Unified dashboard
+              </div>
               <h2 className="mt-6 text-4xl font-bold sm:text-5xl">A command center, not a collection of tabs.</h2>
               <p className="mt-5 text-lg text-white/65">
                 Pipeline, calendar, quote desk, customer context, and AI work queues stay visible in one executive view.
               </p>
             </div>
-            <div className="relative mt-12">
-              <div className="absolute -inset-4 rounded-md gradient-brand-bg opacity-30 blur-3xl" />
-              <div className="relative overflow-hidden rounded-md border border-white/10 bg-white/5 shadow-glow">
-                <img src={dashboardHero} alt="Dashboard" width={1920} height={1080} loading="lazy" className="w-full" />
-              </div>
-            </div>
+            <img src={dashboardHero} alt="Dashboard" width={1920} height={1080} loading="lazy" className="mt-12 w-full" />
           </div>
           <div className="space-y-4">
             {modules.map(([label, value], index) => (
@@ -533,9 +523,6 @@ function Benefits() {
               </div>
               <h3 className="mt-8 text-xl font-bold capitalize">{label}</h3>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">{detail}</p>
-              <div className="mt-8 h-16 overflow-hidden rounded-md bg-muted/70 p-3">
-                <div className="h-full rounded-sm gradient-brand-bg opacity-20 transition-all duration-500 group-hover:opacity-35" />
-              </div>
             </div>
           ))}
         </div>
@@ -720,43 +707,21 @@ function FinalCTA() {
   return (
     <section className="py-24">
       <Container>
-        <div className="relative overflow-hidden rounded-md shadow-glow" style={{ background: "var(--gradient-cta)" }}>
-          <div className="absolute inset-0 grid-bg opacity-25" />
-          <div className="relative grid gap-8 p-8 md:p-12 lg:grid-cols-[1fr_0.72fr] lg:p-16">
-            <div className="max-w-2xl text-white">
-              <p className="text-xs font-bold uppercase tracking-[0.26em] text-white/65">Start the revenue system</p>
-              <h2 className="mt-5 text-4xl font-extrabold leading-tight sm:text-5xl">
-                Capture, qualify, quote, and book from one premium workspace.
+        <div className="relative overflow-hidden rounded-md border border-border bg-card p-8 shadow-card md:p-12">
+          <div className="absolute inset-x-0 top-0 h-1 gradient-brand-bg" />
+          <div className="grid items-center gap-8 lg:grid-cols-[1fr_auto]">
+            <div className="max-w-3xl">
+              <p className="text-xs font-bold uppercase tracking-[0.26em] text-primary">Start the revenue system</p>
+              <h2 className="mt-4 text-3xl font-extrabold leading-tight sm:text-4xl">
+                Ready to run leads, bookings, quotes, and AI from one place?
               </h2>
-              <p className="mt-5 text-lg text-white/85">
-                Launch the front office your service business should have had from day one.
+              <p className="mt-4 text-base text-muted-foreground">
+                Launch a cleaner front office for your service business in minutes.
               </p>
-              <div className="mt-8 flex flex-wrap items-center gap-4">
-                <button className="inline-flex h-12 items-center gap-2 rounded-lg bg-white px-7 text-sm font-semibold text-primary shadow-soft transition-transform hover:scale-[1.02]">
-                  Start Free Trial <ArrowRight className="h-4 w-4" />
-                </button>
-                <button className="inline-flex h-12 items-center gap-2 rounded-lg border border-white/30 bg-white/10 px-7 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/20">
-                  <Play className="h-4 w-4" /> Schedule Demo
-                </button>
-              </div>
             </div>
-            <div className="rounded-md border border-white/20 bg-white/10 p-5 text-white backdrop-blur">
-              <div className="flex items-center justify-between border-b border-white/15 pb-4">
-                <p className="text-sm font-bold">Launch readiness</p>
-                <span className="text-xs text-white/60">Live preview</span>
-              </div>
-              <div className="mt-5 space-y-4">
-                {["Website published", "AI assistant trained", "Booking flow connected", "Quote templates ready"].map((item) => (
-                  <div key={item} className="flex items-center justify-between gap-4">
-                    <span className="text-sm text-white/85">{item}</span>
-                    <Check className="h-4 w-4 text-white" />
-                  </div>
-                ))}
-              </div>
-              <div className="mt-6 rounded-md bg-white/15 p-4">
-                <p className="text-3xl font-extrabold">14 days</p>
-                <p className="text-sm text-white/65">free trial, no credit card required</p>
-              </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <GradientButton>Start Free Trial</GradientButton>
+              <GhostButton>Schedule Demo</GhostButton>
             </div>
           </div>
         </div>
