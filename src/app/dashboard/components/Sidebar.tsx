@@ -55,15 +55,18 @@ export function Sidebar({ onSignOut, businessName, isCollapsed = false, setIsCol
 
   return (
     <>
-      {/* Mobile Toggle Button */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="p-2 rounded-lg bg-card border border-border shadow-soft text-foreground focus:outline-none"
-        >
-          {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-      </div>
+      {/* Mobile Toggle Button (only visible when sidebar is closed) */}
+      {!isOpen && (
+        <div className="lg:hidden fixed top-4 left-4 z-50">
+          <button
+            onClick={() => setIsOpen(true)}
+            className="p-2 rounded-lg bg-card border border-border shadow-soft text-foreground focus:outline-none"
+            aria-label="Open Sidebar"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+        </div>
+      )}
 
       {/* Sidebar Container */}
       <aside
@@ -86,12 +89,23 @@ export function Sidebar({ onSignOut, businessName, isCollapsed = false, setIsCol
                   </span>
                 </div>
               </div>
+              
+              {/* Desktop Menu toggle button */}
               <button
                 onClick={toggleCollapse}
                 className="hidden lg:flex p-1.5 rounded-lg text-[#94A3B8] hover:text-white hover:bg-[#1E293B]/60 transition-colors focus:outline-none"
                 title="Collapse Sidebar"
               >
                 <Menu className="h-4 w-4" />
+              </button>
+
+              {/* Mobile Close Button (Cross icon X at the right) */}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="lg:hidden p-1.5 rounded-lg text-[#94A3B8] hover:text-white hover:bg-[#1E293B]/60 transition-colors focus:outline-none"
+                aria-label="Close Sidebar"
+              >
+                <X className="h-5 w-5" />
               </button>
             </>
           ) : (
