@@ -1,307 +1,231 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useWorkspace } from "../layout";
-import { supabase } from "@/lib/supbase/client";
-import { Bot, MessageSquare, Send, Sparkles, User, ShieldCheck, Clock, Brain } from "lucide-react";
+import { 
+  Bot, 
+  Sparkles, 
+  ArrowRight, 
+  MessageSquare, 
+  Cpu, 
+  Volume2, 
+  Zap,
+  Mail,
+  Check,
+  User
+} from "lucide-react";
 
 export default function AIAssistantPage() {
-  const { currentOrg, setRlsErrors } = useWorkspace();
-  const [conversations, setConversations] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedChat, setSelectedChat] = useState<any>(null);
+  const { currentOrg } = useWorkspace();
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [loadingInterest, setLoadingInterest] = useState(false);
+  const [activeTab, setActiveTab] = useState<"chat" | "voice">("chat");
 
-  // Playground state
-  const [playgroundMsgs, setPlaygroundMsgs] = useState<any[]>([
-    { role: "assistant", content: `Hi there! How can I assist you with scheduling an appointment or checking details today?` }
-  ]);
-  const [inputMsg, setInputMsg] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const [systemInstruction, setSystemInstruction] = useState(
-    "You are an expert AI booking assistant for local service businesses. Be polite, ask for the customer's email and phone, and direct them to schedule an appointment."
-  );
-
-  const orgId = currentOrg?.id || "demo-org-id";
-  const businessName = currentOrg?.name || "our shop";
-
-  const fetchConversations = async () => {
-    if (!currentOrg) return;
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from("ai_conversations")
-        .select("*")
-        .eq("organization_id", currentOrg.id)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        setRlsErrors(prev => [...prev, `ai_conversations: ${error.message}`]);
-      } else {
-        setConversations(data || []);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchConversations();
-    // Reset sandbox greetings on workspace changes
-    setPlaygroundMsgs([
-      { role: "assistant", content: `Hi there! I'm your AI Receptionist at ${businessName}. How can I assist you with scheduling an appointment or pricing today?` }
-    ]);
-  }, [currentOrg]);
-
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputMsg.trim()) return;
-
-    const userMessage = { role: "user", content: inputMsg };
-    setPlaygroundMsgs(prev => [...prev, userMessage]);
-    setInputMsg("");
-    setIsTyping(true);
-
+    if (!email || !email.includes("@")) return;
+    setLoadingInterest(true);
     setTimeout(() => {
-      let aiReply = "";
-      const query = inputMsg.toLowerCase();
-      if (query.includes("book") || query.includes("schedule") || query.includes("appointment")) {
-        aiReply = `I'd love to help you book! What service type are you looking for, and what day works best?`;
-      } else if (query.includes("price") || query.includes("cost") || query.includes("quote")) {
-        aiReply = `Our service rates start at $99. To send you a detailed quote, could you please provide your zip code and email?`;
-      } else if (query.includes("hello") || query.includes("hi")) {
-        aiReply = `Hello! How can I assist you with bookings or quotes today?`;
-      } else {
-        aiReply = `Thanks for reaching out! I've noted down your request: "${inputMsg}". Is there a phone number or email I can reach you at to confirm details?`;
-      }
-
-      setPlaygroundMsgs(prev => [...prev, { role: "assistant", content: aiReply }]);
-      setIsTyping(false);
-    }, 1100);
+      setLoadingInterest(false);
+      setSubmitted(true);
+      setEmail("");
+    }, 800);
   };
-
-  if (loading) {
-    return (
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-pulse">
-        {/* Left config & history skeletons */}
-        <div className="lg:col-span-7 space-y-6">
-          <div className="bg-card/40 border border-border/50 rounded-2xl p-5 space-y-4">
-            <div className="flex items-center gap-2.5 pb-3 border-b border-border/50">
-              <div className="h-8 w-8 bg-slate-200 rounded-lg" />
-              <div className="space-y-1.5 w-1/3">
-                <div className="h-4 bg-slate-200 rounded" />
-                <div className="h-3 bg-slate-200/50 rounded" />
-              </div>
-            </div>
-            <div className="h-20 bg-slate-100/50 rounded-xl w-full" />
-          </div>
-
-          <div className="bg-card/40 border border-border/50 rounded-2xl p-5 space-y-4">
-            <div className="h-4 w-28 bg-slate-200 rounded" />
-            <div className="h-12 bg-slate-100/70 rounded-xl w-full" />
-            <div className="h-12 bg-slate-100/70 rounded-xl w-full" />
-            <div className="h-12 bg-slate-100/70 rounded-xl w-full" />
-          </div>
-        </div>
-
-        {/* Right Sandbox Playground skeleton */}
-        <div className="lg:col-span-5 bg-card/40 border border-border/50 rounded-2xl p-5 h-[480px] flex flex-col justify-between">
-          <div className="flex items-center justify-between pb-3 border-b border-border/50">
-            <div className="h-4 w-32 bg-slate-200 rounded" />
-            <div className="h-4 w-12 bg-slate-200/50 rounded" />
-          </div>
-          <div className="flex-1 py-4 space-y-4">
-            <div className="h-12 bg-slate-100/50 rounded-xl w-2/3 self-start" />
-            <div className="h-12 bg-slate-100/50 rounded-xl w-2/3 ml-auto" />
-          </div>
-          <div className="h-9 bg-slate-200/40 rounded-xl w-full" />
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-reveal-up">
-      {/* Configuration & Chat History (Left) */}
-      <div className="lg:col-span-7 space-y-6">
-        
-        {/* Setup Configuration Panel */}
-        <div className="bg-card border border-border rounded-2xl p-5 shadow-soft space-y-4">
-          <div className="flex items-center gap-2.5 border-b border-border pb-3.5">
-            <div className="h-8 w-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-              <Brain className="h-4.5 w-4.5" />
-            </div>
-            <div>
-              <h2 className="text-sm font-bold text-foreground">AI Receptionist instructions</h2>
-              <p className="text-[10px] text-muted-foreground">Adjust how the chatbot interacts and answers customer questions.</p>
-            </div>
+    <div className="min-h-[75vh] flex flex-col items-center justify-center py-4 px-2 animate-reveal-up relative overflow-hidden">
+      {/* Dynamic Background Glows */}
+      <div className="absolute top-1/4 left-1/3 -translate-x-1/2 w-[450px] h-[220px] bg-primary/10 rounded-full blur-[95px] pointer-events-none -z-10" />
+      <div className="absolute bottom-1/4 right-10 w-[250px] h-[250px] bg-secondary/5 rounded-full blur-[100px] pointer-events-none -z-10" />
+
+      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        {/* Left Column: Info & Early Access Form */}
+        <div className="lg:col-span-6 space-y-6 text-left">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold text-primary animate-pulse w-fit">
+            <Bot className="h-3.5 w-3.5" />
+            <span>AI Receptionist System</span>
           </div>
 
-          <div className="space-y-3.5 text-xs">
-            <div className="space-y-1">
-              <label className="font-bold text-muted-foreground">System Guidelines</label>
-              <textarea
-                rows={3}
-                value={systemInstruction}
-                onChange={(e) => setSystemInstruction(e.target.value)}
-                className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
-              />
-            </div>
-            <div className="flex items-center justify-between text-[10px] text-muted-foreground bg-muted/20 border border-border/50 rounded-xl p-2.5">
-              <div className="flex items-center gap-1.5 font-semibold text-foreground">
-                <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                <span>AI receptionist live on portal</span>
-              </div>
-              <span>Status: Active</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Customer chat logs */}
-        <div className="bg-card border border-border rounded-2xl p-5 shadow-soft space-y-4">
-          <div className="flex items-center justify-between border-b border-border pb-3">
-            <h3 className="text-xs font-bold text-foreground">AI Chat logs history</h3>
-            <span className="text-[9px] font-bold text-muted-foreground font-mono">Conversations</span>
+          <div className="space-y-4">
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground leading-[1.15]">
+              AI Receptionist <br />
+              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                Booking Agents
+              </span>
+            </h1>
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+              Delegate customer scheduling, support requests, and instant quote queries to automated AI receptionist agents. Custom-trained on the business details of{" "}
+              <span className="font-semibold text-foreground">
+                {currentOrg?.name || "your organization"}
+              </span>{" "}
+              to capture bookings 24/7.
+            </p>
           </div>
 
-          {conversations.length === 0 ? (
-            /* Empty State */
-            <div className="p-8 text-center text-xs text-muted-foreground italic border border-dashed border-border rounded-xl bg-muted/10 flex items-center justify-center gap-2">
-              <MessageSquare className="h-4.5 w-4.5 text-muted-foreground/60" />
-              <span>No active chats logged between AI receptionist and customers yet.</span>
-            </div>
-          ) : (
-            <div className="space-y-2 max-h-[300px] overflow-y-auto">
-              {conversations.map((chat) => (
-                <div 
-                  key={chat.id} 
-                  onClick={() => setSelectedChat(chat)}
-                  className={`p-3 bg-muted/15 border border-border/50 rounded-xl flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors
-                    ${selectedChat?.id === chat.id ? "bg-primary/5 border-primary/25" : ""}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-indigo-500 to-[#6366F1] flex items-center justify-center text-white text-[10px] font-bold">
-                      {chat.customer_name?.charAt(0) || "U"}
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-foreground">{chat.customer_name || "Visitor"}</p>
-                      <p className="text-[9px] text-muted-foreground">{chat.customer_email || "No email"}</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <span className="text-[8px] text-muted-foreground flex items-center gap-0.5">
-                      <Clock className="h-3 w-3" />
-                      {new Date(chat.created_at).toLocaleDateString([], { month: "short", day: "numeric" })}
-                    </span>
-                    <span className="text-[8px] font-bold text-emerald-500 bg-emerald-500/10 px-1 rounded-full">
-                      {chat.conversation?.length} messages
-                    </span>
-                  </div>
+          {/* Feature Highlights */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            {[
+              { 
+                icon: Cpu, 
+                title: "Context-Aware Memory", 
+                desc: "Remembers company pricing tiers, service details, and availability rules." 
+              },
+              { 
+                icon: MessageSquare, 
+                title: "Multi-Channel Deploy", 
+                desc: "Integrate chat widgets on your website, WhatsApp, or SMS numbers." 
+              },
+              { 
+                icon: Volume2, 
+                title: "AI Voice Concierge", 
+                desc: "Accept inbound customer phone calls with ultra-low latency response." 
+              },
+              { 
+                icon: Zap, 
+                title: "Instant Sync CRM", 
+                desc: "Qualified lead details are logged automatically under customer databases." 
+              }
+            ].map((feature, i) => (
+              <div 
+                key={i} 
+                className="flex gap-3 p-3.5 rounded-xl border border-border bg-card/40 hover:bg-card hover:border-primary/30 transition-all duration-300 shadow-sm"
+              >
+                <div className="p-2 rounded-lg bg-primary/10 text-primary h-fit shrink-0">
+                  <feature.icon className="h-4 w-4" />
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Interactive Chat Sandbox Playground */}
-      <div className="lg:col-span-5 bg-card border border-border rounded-2xl p-5 shadow-soft flex flex-col justify-between h-[480px] relative overflow-hidden">
-        <div className="flex items-center justify-between border-b border-border pb-3 shrink-0">
-          <div className="flex items-center gap-2">
-            <Bot className="h-4.5 w-4.5 text-[#6366F1]" />
-            <div className="text-left">
-              <h3 className="text-xs font-bold text-foreground">AI receptionist playground</h3>
-              <p className="text-[8px] text-slate-400">Sandbox testing channel</p>
-            </div>
+                <div className="space-y-0.5">
+                  <h3 className="text-xs font-bold text-foreground">{feature.title}</h3>
+                  <p className="text-[10px] text-muted-foreground leading-tight">{feature.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
-          <button 
-            onClick={() => setPlaygroundMsgs([
-              { role: "assistant", content: `Hi there! I'm your AI Receptionist at ${businessName}. How can I assist you with scheduling an appointment or pricing today?` }
-            ])}
-            className="text-[9px] font-bold text-muted-foreground hover:text-foreground"
-          >
-            Reset Chat
-          </button>
+
+          {/* Subscribe form */}
+          <div className="pt-4 max-w-md">
+            {!submitted ? (
+              <form onSubmit={handleSubscribe} className="space-y-2">
+                <label className="text-xs font-semibold text-muted-foreground">
+                  Get notified when AI Receptionists launch
+                </label>
+                <div className="flex gap-2 p-1.5 rounded-xl border border-border bg-card/60 backdrop-blur-md focus-within:ring-1 focus-within:ring-primary focus-within:border-primary/50 transition-all">
+                  <div className="flex items-center pl-2 text-muted-foreground">
+                    <Mail className="h-4 w-4" />
+                  </div>
+                  <input
+                    type="email"
+                    required
+                    placeholder="Enter your email address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="flex-1 min-w-0 bg-transparent border-0 px-2 py-1 text-xs focus:ring-0 focus:outline-none text-foreground"
+                  />
+                  <button
+                    type="submit"
+                    disabled={loadingInterest}
+                    className="px-4 py-1.5 bg-primary hover:bg-primary/95 disabled:opacity-50 text-primary-foreground rounded-lg text-xs font-bold transition-all flex items-center gap-1 shrink-0 shadow-md"
+                  >
+                    {loadingInterest ? "Registering..." : (
+                      <>
+                        Request Beta Access
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="flex items-center gap-3 p-4 rounded-xl border border-success/20 bg-success/5 text-success animate-reveal-up">
+                <div className="p-2 bg-success/10 rounded-lg">
+                  <Check className="h-5 w-5" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold">Beta Request Received!</h4>
+                  <p className="text-[10px] opacity-80">We will update you as soon as test seats become available.</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Selected Chat Log Thread OR Playground messages */}
-        <div className="flex-1 overflow-y-auto py-4 space-y-3.5 pr-1 text-xs">
-          {selectedChat ? (
-            <div className="space-y-4 animate-reveal-up">
-              <div className="bg-muted/45 p-2 border border-border rounded-xl flex items-center justify-between">
-                <span className="text-[9px] font-bold text-muted-foreground">Reviewing Customer Log Chat: {selectedChat.customer_name}</span>
+        {/* Right Column: Premium Mockup Conversation Preview */}
+        <div className="lg:col-span-6 relative flex justify-center items-center">
+          <div className="w-full max-w-md border border-border/80 rounded-2xl bg-card/30 backdrop-blur-xl shadow-soft overflow-hidden flex flex-col aspect-video sm:aspect-[4/3] transition-all hover:border-primary/30">
+            {/* Mock Chat Header */}
+            <div className="px-4 py-2 border-b border-border/60 flex items-center justify-between bg-card/50">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                <span className="text-[10px] font-bold text-foreground">AI receptionist playground</span>
+              </div>
+              <div className="flex bg-muted/60 rounded-lg p-0.5 border border-border/30 text-[9px] font-semibold text-muted-foreground">
                 <button 
-                  onClick={() => setSelectedChat(null)}
-                  className="text-[9px] font-bold text-primary hover:underline"
+                  onClick={() => setActiveTab("chat")}
+                  className={`px-2 py-0.5 rounded transition-colors ${activeTab === "chat" ? "bg-card text-foreground shadow-sm" : ""}`}
                 >
-                  Switch to sandbox
+                  Web Widget
+                </button>
+                <button 
+                  onClick={() => setActiveTab("voice")}
+                  className={`px-2 py-0.5 rounded transition-colors ${activeTab === "voice" ? "bg-card text-foreground shadow-sm" : ""}`}
+                >
+                  Phone Bot
                 </button>
               </div>
-              {selectedChat.conversation.map((msg: any, idx: number) => {
-                const isAI = msg.role === "assistant";
-                return (
-                  <div key={idx} className={`flex items-start gap-2.5 ${isAI ? "" : "flex-row-reverse"}`}>
-                    <div className={`h-6.5 w-6.5 rounded-full shrink-0 flex items-center justify-center font-bold text-[9px]
-                      ${isAI ? "bg-emerald-500/10 text-emerald-500" : "bg-primary text-white"}`}>
-                      {isAI ? <Bot className="h-3.5 w-3.5" /> : <User className="h-3 w-3" />}
-                    </div>
-                    <div className={`p-3 rounded-xl max-w-[80%] leading-relaxed font-medium
-                      ${isAI ? "bg-muted/40 text-foreground" : "bg-primary/5 text-foreground border border-primary/20"}`}>
-                      {msg.content}
-                    </div>
-                  </div>
-                );
-              })}
             </div>
-          ) : (
-            // Sandbox view
-            playgroundMsgs.map((msg, idx) => {
-              const isAI = msg.role === "assistant";
-              return (
-                <div key={idx} className={`flex items-start gap-2.5 ${isAI ? "" : "flex-row-reverse"} animate-reveal-up`}>
-                  <div className={`h-6.5 w-6.5 rounded-full shrink-0 flex items-center justify-center font-bold text-[9px]
-                    ${isAI ? "bg-[#6366F1]/10 text-[#6366F1]" : "bg-primary text-white"}`}>
-                    {isAI ? <Sparkles className="h-3.5 w-3.5" /> : <User className="h-3 w-3" />}
-                  </div>
-                  <div className={`p-3 rounded-xl max-w-[80%] leading-relaxed font-medium
-                    ${isAI ? "bg-muted/40 text-foreground" : "bg-primary/5 text-foreground border border-primary/20"}`}>
-                    {msg.content}
+
+            {/* Mock Conversation View */}
+            <div className="flex-1 p-4 bg-muted/5 relative overflow-hidden flex flex-col justify-center items-center">
+              {/* Blurred chat list background */}
+              <div className="absolute inset-0 p-4 space-y-3 filter blur-[3px] opacity-25 select-none pointer-events-none flex flex-col justify-end">
+                <div className="flex items-start gap-2 max-w-[80%]">
+                  <div className="h-6 w-6 rounded-full bg-primary/20" />
+                  <div className="bg-card/40 p-2.5 rounded-xl space-y-1 w-full">
+                    <div className="h-2 w-1/3 bg-foreground/20 rounded" />
+                    <div className="h-2 w-full bg-foreground/15 rounded" />
                   </div>
                 </div>
-              );
-            })
-          )}
-
-          {isTyping && (
-            <div className="flex items-start gap-2.5">
-              <div className="h-6.5 w-6.5 rounded-full shrink-0 bg-[#6366F1]/10 text-[#6366F1] flex items-center justify-center">
-                <Sparkles className="h-3.5 w-3.5 animate-spin" />
+                <div className="flex items-start gap-2 max-w-[80%] ml-auto flex-row-reverse">
+                  <div className="h-6 w-6 rounded-full bg-primary/20" />
+                  <div className="bg-primary/10 p-2.5 rounded-xl space-y-1 w-full">
+                    <div className="h-2 w-2/3 bg-foreground/15 rounded" />
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 max-w-[80%]">
+                  <div className="h-6 w-6 rounded-full bg-primary/20" />
+                  <div className="bg-card/40 p-2.5 rounded-xl space-y-1 w-full">
+                    <div className="h-2.5 w-1/2 bg-primary/20 rounded" />
+                    <div className="h-2 w-5/6 bg-foreground/15 rounded" />
+                  </div>
+                </div>
               </div>
-              <div className="p-3 bg-muted/40 text-muted-foreground rounded-xl text-[10px] font-bold">
-                AI receptionist typing...
+
+              {/* Glass Coming Soon Card overlay */}
+              <div className="z-10 p-5 rounded-2xl border border-border bg-card/75 backdrop-blur-md max-w-xs text-center space-y-3.5 shadow-soft animate-reveal-up">
+                <div className="mx-auto w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-primary-foreground shadow-md">
+                  <Sparkles className="h-5 w-5 animate-pulse" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-sm font-extrabold text-foreground">Interactive Playground</h3>
+                  <p className="text-[10px] text-muted-foreground leading-normal">
+                    Finetuning scheduling pipelines and natural language understanding models. 
+                  </p>
+                </div>
+
+                {/* Progress bar info */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[8px] font-bold text-muted-foreground">
+                    <span>LAUNCH PROGRESS</span>
+                    <span className="text-primary font-black">92% COMPLETE</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden border border-border/20 p-[1px]">
+                    <div className="h-full bg-gradient-to-r from-primary to-secondary rounded-full w-[92%]" />
+                  </div>
+                </div>
               </div>
             </div>
-          )}
+          </div>
         </div>
-
-        {/* Input sender */}
-        <form onSubmit={handleSendMessage} className="border-t border-border pt-3.5 shrink-0 flex gap-2">
-          <input
-            type="text"
-            disabled={!!selectedChat}
-            value={inputMsg}
-            onChange={(e) => setInputMsg(e.target.value)}
-            placeholder={selectedChat ? "In viewing log mode..." : "Ask sandbox: 'Book inspection'..."}
-            className="flex-1 px-3 py-2 text-xs bg-muted/40 border border-border rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-foreground disabled:opacity-50"
-          />
-          <button
-            type="submit"
-            disabled={!!selectedChat || !inputMsg.trim()}
-            className="px-3.5 py-2 bg-[#6366F1] hover:bg-[#4F46E5] text-white rounded-xl shadow-md disabled:opacity-50 shrink-0"
-          >
-            <Send className="h-4 w-4" />
-          </button>
-        </form>
       </div>
     </div>
   );

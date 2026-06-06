@@ -177,7 +177,10 @@ export default function LeadsPage() {
       lead.email?.toLowerCase().includes(search.toLowerCase()) ||
       lead.source?.toLowerCase().includes(search.toLowerCase());
     
-    const matchesStatus = statusFilter === "all" || lead.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || 
+      lead.status === statusFilter || 
+      (statusFilter === "interested" && lead.status === "qualified") ||
+      (statusFilter === "clients" && lead.status === "closed");
     return matchesSearch && matchesStatus;
   });
 
@@ -277,10 +280,10 @@ export default function LeadsPage() {
                 className="w-full pl-9 pr-4 py-2 text-xs bg-card border border-border rounded-xl focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all text-foreground appearance-none"
               >
                 <option value="all">All Statuses</option>
-                <option value="new">New</option>
+                <option value="new">Leads Generated</option>
                 <option value="contacted">Contacted</option>
-                <option value="qualified">Qualified</option>
-                <option value="closed">Closed Won</option>
+                <option value="interested">Interested</option>
+                <option value="clients">Clients</option>
               </select>
             </div>
           </div>
@@ -325,10 +328,13 @@ export default function LeadsPage() {
                             <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold capitalize border
                               ${lead.status === "new" ? "bg-blue-500/10 text-blue-500 border-blue-500/20" : 
                                 lead.status === "contacted" ? "bg-amber-500/10 text-amber-500 border-amber-500/20" : 
-                                lead.status === "qualified" ? "bg-[#6366F1]/10 text-[#6366F1] border-[#6366F1]/20" : 
+                                (lead.status === "interested" || lead.status === "qualified") ? "bg-[#6366F1]/10 text-[#6366F1] border-[#6366F1]/20" : 
                                 "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"}`}
                             >
-                              {lead.status === "closed" ? "Closed Won" : lead.status}
+                              {lead.status === "new" ? "Leads Generated" : 
+                               lead.status === "contacted" ? "Contacted" : 
+                               (lead.status === "interested" || lead.status === "qualified") ? "Interested" : 
+                               "Clients"}
                             </span>
                           </td>
                           <td className="px-5 py-3.5 text-muted-foreground">
@@ -380,16 +386,18 @@ export default function LeadsPage() {
                   <div className="space-y-2">
                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Set Stage</span>
                     <div className="grid grid-cols-2 gap-1.5">
-                      {["new", "contacted", "qualified", "closed"].map((st) => (
+                      {["new", "contacted", "interested", "clients"].map((st) => (
                         <button
                           key={st}
                           onClick={() => handleStatusChange(selectedLead.id, st)}
                           className={`px-3 py-1.5 text-[10px] font-bold rounded-lg border capitalize transition-colors
-                            ${selectedLead.status === st
+                            ${(selectedLead.status === st || 
+                               (st === "interested" && selectedLead.status === "qualified") || 
+                               (st === "clients" && selectedLead.status === "closed"))
                               ? "bg-primary text-white border-primary shadow-soft"
                               : "bg-muted/20 border-border text-foreground hover:bg-muted/50"}`}
                         >
-                          {st === "closed" ? "Closed Won" : st}
+                          {st === "new" ? "Leads Generated" : st}
                         </button>
                       ))}
                     </div>

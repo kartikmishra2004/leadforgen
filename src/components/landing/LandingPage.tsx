@@ -133,6 +133,12 @@ function Nav() {
 
 function Hero() {
   const trust = ["White-labeled websites", "AI-powered automation", "Appointment booking", "Lead management", "Customer CRM"];
+  const heroAvatars = [
+    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&h=100&q=80",
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&h=100&q=80",
+    "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=100&h=100&q=80",
+    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=100&h=100&q=80",
+  ];
 
   return (
     <section className="relative overflow-hidden">
@@ -142,8 +148,13 @@ function Hero() {
         <div className="mx-auto max-w-4xl text-center">
           <div className="mx-auto inline-flex items-center gap-3 rounded-full border border-border bg-card/70 px-4 py-1.5 text-xs font-medium text-foreground backdrop-blur-md shadow-soft">
             <div className="flex -space-x-1.5">
-              {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="h-5 w-5 rounded-full border-2 border-background gradient-brand-bg" style={{ opacity: 0.65 + i * 0.1 }} />
+              {heroAvatars.map((url, i) => (
+                <img 
+                  key={i} 
+                  src={url} 
+                  alt={`User avatar ${i + 1}`} 
+                  className="h-5 w-5 rounded-full border-2 border-background object-cover" 
+                />
               ))}
             </div>
             <span className="text-muted-foreground">Trusted by</span>
@@ -189,7 +200,7 @@ function Hero() {
           </div>
         </div>
 
-        <img src={dashboardHero} alt="Lead For Gen dashboard" width={1920} height={1080} className="mx-auto mt-16 w-full max-w-6xl" />
+        <img src={dashboardHero} alt="Lead For Gen dashboard" width={1920} height={1080} className="mx-auto mt-16 w-full max-w-6xl rounded-3xl lg:rounded-[32px] border border-border/50 shadow-glow" />
       </Container>
     </section>
   );
@@ -441,7 +452,7 @@ function Dashboard() {
                 Pipeline, calendar, quote desk, customer context, and AI work queues stay visible in one executive view.
               </p>
             </div>
-            <img src={dashboardHero} alt="Dashboard" width={1920} height={1080} loading="lazy" className="mt-12 w-full" />
+            <img src={dashboardHero} alt="Dashboard" width={1920} height={1080} loading="lazy" className="mt-12 w-full rounded-3xl border border-white/10 shadow-2xl" />
           </div>
           <div className="space-y-4">
             {modules.map(([label, value], index) => (
@@ -619,12 +630,48 @@ function Comparison() {
 
 function Testimonials() {
   const items = [
-    { n: "Maria Lopez", b: "Sparkle Cleaning Co.", ind: "Cleaning", q: "We tripled our bookings in 3 months. The AI assistant alone replaced a part-time hire." },
-    { n: "James Carter", b: "Carter HVAC", ind: "HVAC", q: "Quotes go out in minutes, not days. Our close rate jumped by 42%." },
-    { n: "Dr. Priya Shah", b: "Bright Smile Dental", ind: "Dentistry", q: "Patient bookings, reminders, and intake finally feel like one calm system." },
-    { n: "Tom Reilly", b: "Reilly Roofing", ind: "Roofing", q: "Best ROI tool we have adopted. The branded website paid for itself in week one." },
-    { n: "Alex Nguyen", b: "GreenScape", ind: "Landscaping", q: "Leads stop falling through the cracks. Period." },
-    { n: "Sarah Kim", b: "Kim Legal Group", ind: "Law", q: "Consultation booking and intake in one place. Clients love it." },
+    { 
+      n: "Maria Lopez", 
+      b: "Sparkle Cleaning Co.", 
+      ind: "Cleaning", 
+      q: "We tripled our bookings in 3 months. The AI assistant alone replaced a part-time hire.",
+      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&h=150&q=80"
+    },
+    { 
+      n: "James Carter", 
+      b: "Carter HVAC", 
+      ind: "HVAC", 
+      q: "Quotes go out in minutes, not days. Our close rate jumped by 42%.",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&h=150&q=80"
+    },
+    { 
+      n: "Dr. Priya Shah", 
+      b: "Bright Smile Dental", 
+      ind: "Dentistry", 
+      q: "Patient bookings, reminders, and intake finally feel like one calm system.",
+      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&h=150&q=80"
+    },
+    { 
+      n: "Tom Reilly", 
+      b: "Reilly Roofing", 
+      ind: "Roofing", 
+      q: "Best ROI tool we have adopted. The branded website paid for itself in week one.",
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&h=150&q=80"
+    },
+    { 
+      n: "Alex Nguyen", 
+      b: "GreenScape", 
+      ind: "Landscaping", 
+      q: "Leads stop falling through the cracks. Period.",
+      avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&h=150&q=80"
+    },
+    { 
+      n: "Sarah Kim", 
+      b: "Kim Legal Group", 
+      ind: "Law", 
+      q: "Consultation booking and intake in one place. Clients love it.",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80"
+    },
   ];
 
   return (
@@ -644,9 +691,17 @@ function Testimonials() {
               </div>
               <p className="mt-4 text-foreground">&quot;{item.q}&quot;</p>
               <div className="mt-6 flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full gradient-brand-bg text-sm font-bold text-primary-foreground">
-                  {item.n.split(" ").map((part) => part[0]).join("")}
-                </div>
+                {item.avatar ? (
+                  <img 
+                    src={item.avatar} 
+                    alt={item.n} 
+                    className="h-11 w-11 rounded-full object-cover border border-border/80" 
+                  />
+                ) : (
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full gradient-brand-bg text-sm font-bold text-primary-foreground">
+                    {item.n.split(" ").map((part) => part[0]).join("")}
+                  </div>
+                )}
                 <div>
                   <p className="text-sm font-semibold">{item.n}</p>
                   <p className="text-xs text-muted-foreground">{item.b} - {item.ind}</p>

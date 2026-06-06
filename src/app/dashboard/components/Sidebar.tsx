@@ -80,7 +80,7 @@ export function Sidebar({ onSignOut, businessName, isCollapsed = false, setIsCol
         >
           {!isCollapsed ? (
             <>
-              <div className="flex items-center gap-3 min-w-0">
+              <Link href="/" className="flex items-center gap-3 min-w-0 hover:opacity-90 transition-opacity">
                 <img src="/logo.png" alt="Lead For Gen Logo" className="h-8 w-8 object-contain shrink-0" />
                 <div className="flex flex-col min-w-0">
                   <span className="font-bold tracking-tight text-white text-base truncate">Lead For Gen</span>
@@ -88,7 +88,7 @@ export function Sidebar({ onSignOut, businessName, isCollapsed = false, setIsCol
                     {businessName || "Workspace"}
                   </span>
                 </div>
-              </div>
+              </Link>
               
               {/* Desktop Menu toggle button */}
               <button

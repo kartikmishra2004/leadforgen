@@ -141,10 +141,10 @@ export default function DashboardOverview() {
   const aiChatsCount = aiConversations.length;
 
   const pipelineStages = [
-    { id: "new", label: "New Leads", bgLight: "bg-blue-500/10", text: "text-blue-500" },
+    { id: "new", label: "Leads Generated", bgLight: "bg-blue-500/10", text: "text-blue-500" },
     { id: "contacted", label: "Contacted", bgLight: "bg-amber-500/10", text: "text-amber-500" },
-    { id: "qualified", label: "Qualified", bgLight: "bg-[#6366F1]/10", text: "text-[#6366F1]" },
-    { id: "closed", label: "Closed Won", bgLight: "bg-emerald-500/10", text: "text-emerald-500" }
+    { id: "interested", label: "Interested", bgLight: "bg-[#6366F1]/10", text: "text-[#6366F1]" },
+    { id: "clients", label: "Clients", bgLight: "bg-emerald-500/10", text: "text-emerald-500" }
   ];
 
   // If completely empty dashboard
@@ -246,7 +246,7 @@ export default function DashboardOverview() {
         <div className="lg:col-span-2 space-y-6">
           
           {/* Pipeline */}
-          <div className="bg-card border border-border rounded-2xl p-5 shadow-soft space-y-4">
+          <div className="bg-card border border-border rounded-2xl p-5 shadow-soft h-[260px] flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-foreground">Interactive Pipeline</h3>
               <Link 
@@ -257,41 +257,45 @@ export default function DashboardOverview() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-4 gap-2 flex-grow mt-2.5">
               {pipelineStages.map((stage) => {
-                const stageLeads = leads.filter(l => l.status === stage.id);
+                const stageLeads = leads.filter(l => {
+                  const normalized = l.status === "qualified" ? "interested" : (l.status === "closed" ? "clients" : (l.status || "new"));
+                  return normalized === stage.id;
+                });
                 return (
-                  <div key={stage.id} className="space-y-3 bg-muted/20 p-2.5 rounded-xl border border-border/60">
-                    <div className="flex items-center justify-between pb-1 border-b border-border/50">
-                      <span className="text-[10px] font-bold text-foreground truncate">{stage.label}</span>
-                      <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-full ${stage.bgLight} ${stage.text}`}>
+                  <div key={stage.id} className="h-full flex flex-col justify-between bg-muted/20 p-2 rounded-xl border border-border/60">
+                    <div className="flex items-center justify-between pb-1 border-b border-border/50 shrink-0">
+                      <span className="text-[9px] font-bold text-foreground truncate">{stage.label}</span>
+                      <span className={`text-[8px] font-extrabold px-1.5 py-0.5 rounded-full ${stage.bgLight} ${stage.text}`}>
                         {stageLeads.length}
                       </span>
                     </div>
 
-                    <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
+                    <div className="space-y-1.5 flex-grow mt-2 overflow-hidden flex flex-col justify-start">
                       {stageLeads.length === 0 ? (
-                        <div className="text-[9px] text-muted-foreground text-center py-6 italic border border-dashed border-border rounded-lg bg-card/40">
+                        <div className="text-[8px] text-muted-foreground text-center py-4 italic border border-dashed border-border rounded-lg bg-card/40 flex-grow flex items-center justify-center">
                           Empty
                         </div>
                       ) : (
-                        stageLeads.map((lead) => (
-                          <Link 
-                            key={lead.id} 
-                            href="/dashboard/leads"
-                            className="block p-2.5 bg-card border border-border hover:border-primary/45 rounded-lg shadow-soft transition-all hover:scale-[1.01] hover:-translate-y-0.5 group space-y-1.5"
-                          >
-                            <div className="flex items-start justify-between gap-1">
-                              <span className="text-[10px] font-bold text-foreground leading-tight group-hover:text-primary transition-colors truncate">
-                                {lead.name}
-                              </span>
-                              <ArrowUpRight className="h-3 w-3 text-muted-foreground/60 opacity-0 group-hover:opacity-100 transition-opacity" />
-                            </div>
-                            <div className="flex items-center justify-between text-[9px] text-muted-foreground">
-                              <span className="truncate max-w-[65px]">{lead.email || "No email"}</span>
-                            </div>
-                          </Link>
-                        ))
+                        <div className="space-y-1.5 flex-grow">
+                          {stageLeads.slice(0, 2).map((lead) => (
+                            <Link 
+                              key={lead.id} 
+                              href="/dashboard/leads"
+                              className="block p-2 bg-card border border-border rounded-lg shadow-soft space-y-1 cursor-default shrink-0"
+                            >
+                              <div className="flex items-start justify-between gap-1">
+                                <span className="text-[9px] font-bold text-foreground leading-tight truncate">
+                                  {lead.name}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between text-[8px] text-muted-foreground">
+                                <span className="truncate max-w-[55px]">{lead.email || "No email"}</span>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -301,7 +305,7 @@ export default function DashboardOverview() {
           </div>
 
           {/* Recent Invoiced Quotes */}
-          <div className="bg-card border border-border rounded-2xl p-5 shadow-soft space-y-4">
+          <div className="bg-card border border-border rounded-2xl p-5 shadow-soft h-[200px] flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold text-foreground">Recent Invoiced Quotes</h3>
@@ -315,46 +319,70 @@ export default function DashboardOverview() {
               </Link>
             </div>
 
-            <div className="space-y-2.5">
+            <div className="space-y-2 flex-grow flex flex-col justify-end pt-2">
               {quotes.length === 0 ? (
-                <div className="p-8 text-center text-xs text-muted-foreground italic border border-dashed border-border rounded-xl bg-muted/10 flex items-center justify-center gap-2">
-                  <AlertCircle className="h-4.5 w-4.5 text-muted-foreground/60" />
-                  <span>No quotes drafted. Click 'View all quotes' to draft a proposal.</span>
+                <div className="h-full flex-grow flex flex-col items-center justify-center gap-1.5 p-3 border border-dashed border-border rounded-xl bg-muted/5">
+                  <AlertCircle className="h-4.5 w-4.5 text-muted-foreground/40" />
+                  <span className="text-[10px] text-muted-foreground italic">No quotes drafted yet.</span>
                 </div>
               ) : (
-                quotes.slice(0, 3).map((quote) => (
-                  <div key={quote.id} className="flex items-center justify-between p-3 bg-muted/20 border border-border/60 rounded-xl hover:bg-muted/40 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-primary/10 to-secondary/10 flex items-center justify-center font-bold text-xs text-primary">
-                        Q
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold text-foreground">{quote.quote_number || "Estimate"}</p>
-                        <p className="text-[9px] text-muted-foreground truncate max-w-[150px]">{quote.description || "Proposal Estimate"}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-extrabold text-foreground">${Number(quote.amount).toFixed(2)}</span>
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full capitalize
-                        ${quote.status === "accepted" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : 
-                          quote.status === "sent" ? "bg-blue-500/10 text-blue-500 border border-blue-500/20" : 
-                          "bg-amber-500/10 text-amber-500 border border-amber-500/20"}`}
-                      >
-                        {quote.status}
-                      </span>
-                    </div>
-                  </div>
-                ))
+                <div className="space-y-2 flex-grow flex flex-col justify-between">
+                  {(() => {
+                    const displayQuotes = quotes.slice(0, 2);
+                    const placeholders = Math.max(0, 2 - displayQuotes.length);
+                    return (
+                      <>
+                        {displayQuotes.map((quote) => (
+                          <div key={quote.id} className="flex items-center justify-between p-2 bg-muted/20 border border-border/60 rounded-xl hover:bg-muted/30 transition-colors">
+                            <div className="flex items-center gap-3 truncate">
+                              <div className="h-7 w-7 rounded-lg bg-gradient-to-tr from-primary/10 to-secondary/10 flex items-center justify-center font-bold text-[10px] text-primary shrink-0">
+                                Q
+                              </div>
+                              <div className="truncate">
+                                <p className="text-[11px] font-bold text-foreground truncate">{quote.quote_number || "Estimate"}</p>
+                                <p className="text-[9px] text-muted-foreground truncate max-w-[130px]">{quote.description || "Proposal Estimate"}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3 shrink-0">
+                              <span className="text-[11px] font-extrabold text-foreground">${Number(quote.amount).toFixed(2)}</span>
+                              <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full capitalize
+                                ${quote.status === "accepted" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : 
+                                  quote.status === "sent" ? "bg-blue-500/10 text-blue-500 border border-blue-500/20" : 
+                                  "bg-amber-500/10 text-amber-500 border border-amber-500/20"}`}
+                              >
+                                {quote.status}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                        {[...Array(placeholders)].map((_, idx) => (
+                          <div key={`p-${idx}`} className="flex items-center justify-between p-2 border border-dashed border-border/60 rounded-xl bg-muted/5 opacity-40 select-none">
+                            <div className="flex items-center gap-3">
+                              <div className="h-7 w-7 rounded-lg border border-dashed border-border flex items-center justify-center font-bold text-[9px] text-muted-foreground/40">
+                                -
+                              </div>
+                              <div>
+                                <p className="text-[10px] font-bold text-muted-foreground/40">Empty Quote Slot</p>
+                                <p className="text-[8px] text-muted-foreground/30">No active proposal</p>
+                              </div>
+                            </div>
+                            <span className="text-[10px] font-extrabold text-muted-foreground/20">$0.00</span>
+                          </div>
+                        ))}
+                      </>
+                    );
+                  })()}
+                </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Right Column: Appointments calendar + chart + promo widgets */}
+        {/* Right Column: Appointments calendar */}
         <div className="space-y-6">
           {/* Mini Calendar UI */}
-          <div className="bg-card border border-border rounded-2xl p-5 shadow-soft space-y-3">
-            <div className="flex items-center justify-between">
+          <div className="bg-card border border-border rounded-2xl p-5 shadow-soft flex flex-col h-[484px] justify-between">
+            <div className="flex items-center justify-between pb-2">
               <h3 className="text-sm font-bold text-foreground">Appointments</h3>
               <Link 
                 href="/dashboard/appointments"
@@ -364,21 +392,21 @@ export default function DashboardOverview() {
               </Link>
             </div>
 
-            {/* Custom Interactive Mini Month Calendar */}
-            <div className="border border-border/60 rounded-xl p-3 bg-muted/15 space-y-3">
-              <div className="flex items-center justify-between border-b border-border/50 pb-1.5">
+            {/* Custom Interactive Mini Month Calendar (approx 60% height) */}
+            <div className="border border-border/60 rounded-xl p-3 bg-muted/15 h-[265px] flex flex-col justify-between shrink-0">
+              <div className="flex items-center justify-between border-b border-border/50 pb-1.5 shrink-0">
                 <span className="text-[11px] font-bold text-foreground">June 2026</span>
                 <span className="text-[9px] font-bold text-muted-foreground uppercase">Schedule</span>
               </div>
-              <div className="grid grid-cols-7 gap-1 text-center">
+              <div className="grid grid-cols-7 gap-1 text-center flex-grow items-center">
                 {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => (
                   <span key={i} className="text-[9px] font-bold text-muted-foreground">{d}</span>
                 ))}
                 
                 {[1, 2, 3, 4, 5].map((d) => (
-                  <span key={d} className="text-[10px] py-1 text-muted-foreground/60">{d}</span>
+                  <span key={d} className="text-[10px] py-1 text-muted-foreground/50 flex items-center justify-center font-medium">{d}</span>
                 ))}
-                <span className="text-[10px] py-1 bg-[#6366F1] text-white font-bold rounded-lg shadow-md shadow-[#6366F1]/20">6</span>
+                <span className="text-[10px] py-1 bg-[#6366F1] text-white font-bold rounded-lg shadow-md shadow-[#6366F1]/20 flex items-center justify-center">6</span>
                 {[7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((d) => {
                   const hasAppt = appointments.some(appt => {
                     const date = new Date(appt.appointment_date);
@@ -388,8 +416,8 @@ export default function DashboardOverview() {
                     <Link 
                       key={d} 
                       href="/dashboard/appointments"
-                      className={`text-[10px] py-1 font-medium relative rounded-lg hover:bg-muted transition-colors cursor-pointer
-                        ${hasAppt ? "text-primary font-bold" : "text-foreground"}`}
+                      className={`text-[10px] py-1 font-bold relative rounded-lg hover:bg-muted transition-colors cursor-pointer flex items-center justify-center
+                        ${hasAppt ? "text-primary font-black" : "text-foreground"}`}
                     >
                       {d}
                       {hasAppt && (
@@ -402,101 +430,124 @@ export default function DashboardOverview() {
             </div>
 
             {/* Upcoming Appointments snippet */}
-            <div className="space-y-2 pt-1">
-              {appointments.length === 0 ? (
-                <p className="text-[10px] text-muted-foreground italic text-center py-2">No upcoming meetings scheduled.</p>
-              ) : (
-                appointments.slice(0, 2).map((appt) => (
-                  <div key={appt.id} className="p-2 bg-muted/30 border border-border/50 rounded-xl flex items-center justify-between text-[10px] hover:bg-muted/50 transition-colors">
-                    <div className="truncate pr-2">
-                      <p className="font-bold text-foreground truncate">{appt.title}</p>
-                      <p className="text-muted-foreground truncate">{new Date(appt.appointment_date).toLocaleDateString([], { month: "short", day: "numeric" })}</p>
-                    </div>
-                    <span className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold tracking-wide shrink-0">
-                      Confirmed
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Acquisition Growth Chart */}
-          <div className="bg-card border border-border rounded-2xl p-5 shadow-soft space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-bold text-foreground">Acquisition Growth</h3>
-                <p className="text-[10px] text-muted-foreground">Monthly leads generated</p>
+            <div className="space-y-1.5 flex-grow flex flex-col justify-start mt-3 overflow-hidden">
+              <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider block shrink-0">Upcoming Events</span>
+              <div className="space-y-1.5 flex-grow flex flex-col justify-between">
+                {(() => {
+                  const activeAppts = appointments.filter(a => a.status !== "cancelled").slice(0, 2);
+                  const calendarPlaceholders = Math.max(0, 2 - activeAppts.length);
+                  return (
+                    <>
+                      {activeAppts.map((appt) => (
+                        <div key={appt.id} className="p-2 bg-muted/30 border border-border/50 rounded-xl flex items-center justify-between text-[10px] hover:bg-muted/50 transition-colors">
+                          <div className="truncate pr-2 space-y-0.5">
+                            <p className="font-bold text-foreground truncate">{appt.title}</p>
+                            <p className="text-muted-foreground text-[8px] truncate">
+                              {new Date(appt.appointment_date).toLocaleDateString([], { month: "short", day: "numeric" })} at{" "}
+                              {new Date(appt.appointment_date).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                            </p>
+                          </div>
+                          <span className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold tracking-wide shrink-0">
+                            Confirmed
+                          </span>
+                        </div>
+                      ))}
+                      {[...Array(calendarPlaceholders)].map((_, idx) => (
+                        <div key={`p-${idx}`} className="p-2 border border-dashed border-border/60 rounded-xl flex items-center justify-between text-[10px] bg-muted/5 opacity-40 select-none">
+                          <div className="truncate pr-2 space-y-0.5">
+                            <p className="font-bold text-muted-foreground/40">Available Slot</p>
+                            <p className="text-[8px] text-muted-foreground/30">No scheduled booking</p>
+                          </div>
+                          <span className="border border-dashed border-border/60 text-muted-foreground/20 px-1.5 py-0.5 rounded text-[8px] font-bold tracking-wide shrink-0">
+                            Open
+                          </span>
+                        </div>
+                      ))}
+                    </>
+                  );
+                })()}
               </div>
-              <TrendingUp className="h-4 w-4 text-emerald-500" />
             </div>
-
-            {/* Premium styled SVG Bar Graph */}
-            <div className="h-32 w-full pt-2 flex items-end justify-between gap-2">
-              {[
-                { label: "Jan", val: 30 },
-                { label: "Feb", val: 45 },
-                { label: "Mar", val: 62 },
-                { label: "Apr", val: 55 },
-                { label: "May", val: 78 },
-                { label: "Jun", val: Math.min(100, Math.max(15, leads.length * 18)) }
-              ].map((bar, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group">
-                  <div className="w-full relative rounded-t-lg bg-gradient-to-t from-[#6366F1] to-[#EC4899] group-hover:brightness-110 transition-all shadow-md shadow-[#6366F1]/10 flex justify-center items-start overflow-hidden min-h-[15px] cursor-pointer" style={{ height: `${bar.val}%` }}>
-                    <div className="opacity-0 group-hover:opacity-100 absolute top-1 text-[8px] font-bold text-white transition-opacity bg-black/40 px-1 rounded">
-                      {bar.val}
-                    </div>
-                  </div>
-                  <span className="text-[9px] font-semibold text-muted-foreground">{bar.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Quick Info / Dynamic Gradient Promo Cards */}
-          <div className="grid grid-cols-2 gap-3">
-            {latestQuote ? (
-              <Link 
-                href="/dashboard/quotes"
-                className="p-4 rounded-2xl bg-gradient-to-br from-[#8B5CF6] to-[#EC4899] text-white shadow-soft relative overflow-hidden group hover:scale-[1.02] transition-transform block"
-              >
-                <div className="absolute -right-4 -bottom-4 h-16 w-16 bg-white/10 rounded-full blur-xl group-hover:scale-125 transition-transform" />
-                <p className="text-[10px] font-bold uppercase tracking-wider text-white/80">Active Estimate</p>
-                <p className="text-sm font-extrabold mt-1 truncate">{latestQuote.quote_number || "Estimate"}</p>
-                <p className="text-[10px] text-white/90 mt-0.5">${Number(latestQuote.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-              </Link>
-            ) : (
-              <Link 
-                href="/dashboard/quotes"
-                className="p-4 rounded-2xl bg-gradient-to-br from-[#8B5CF6] to-[#EC4899] text-white shadow-soft relative overflow-hidden group hover:scale-[1.02] transition-transform block text-center flex flex-col justify-center"
-              >
-                <p className="text-[10px] font-bold uppercase tracking-wider text-white/80">Draft Quote</p>
-                <p className="text-xs font-bold mt-2">Create Quote</p>
-              </Link>
-            )}
-
-            {latestChat ? (
-              <Link 
-                href="/dashboard/ai"
-                className="p-4 rounded-2xl bg-gradient-to-br from-[#3B82F6] to-[#06B6D4] text-white shadow-soft relative overflow-hidden group hover:scale-[1.02] transition-transform block"
-              >
-                <div className="absolute -right-4 -bottom-4 h-16 w-16 bg-white/10 rounded-full blur-xl group-hover:scale-125 transition-transform" />
-                <p className="text-[10px] font-bold uppercase tracking-wider text-white/80">AI Receptionist</p>
-                <p className="text-sm font-extrabold mt-1 truncate">{latestChat.customer_name || "Visitor"}</p>
-                <p className="text-[10px] text-white/90 mt-0.5">{aiChatsCount} Live Chats</p>
-              </Link>
-            ) : (
-              <Link 
-                href="/dashboard/ai"
-                className="p-4 rounded-2xl bg-gradient-to-br from-[#3B82F6] to-[#06B6D4] text-white shadow-soft relative overflow-hidden group hover:scale-[1.02] transition-transform block text-center flex flex-col justify-center"
-              >
-                <p className="text-[10px] font-bold uppercase tracking-wider text-white/80">AI Chat Sandbox</p>
-                <p className="text-xs font-bold mt-2">Test chatbot</p>
-              </Link>
-            )}
           </div>
         </div>
       </div>
+
+      {/* Funnel Conversion Rates Section */}
+      {(() => {
+        const countClients = leads.filter(l => l.status === "clients" || l.status === "closed").length;
+        const countInterested = leads.filter(l => l.status === "interested" || l.status === "qualified").length + countClients;
+        const countContacted = leads.filter(l => l.status === "contacted").length + countInterested;
+        const countGenerated = totalLeads;
+
+        const contactRate = countGenerated > 0 ? (countContacted / countGenerated) * 100 : 0;
+        const interestRate = countContacted > 0 ? (countInterested / countContacted) * 100 : 0;
+        const clientRate = countInterested > 0 ? (countClients / countInterested) * 100 : 0;
+        const overallRate = countGenerated > 0 ? (countClients / countGenerated) * 100 : 0;
+
+        return (
+          <div className="bg-card border border-border rounded-2xl p-5 shadow-soft space-y-5">
+            <div>
+              <h3 className="text-sm font-bold text-foreground">Funnel Conversion Analysis</h3>
+              <p className="text-[10px] text-muted-foreground">Lead conversion rates across all funnel stages.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+              {/* Simple Funnel Column Chart */}
+              <div className="md:col-span-8 h-48 flex items-end justify-between gap-4 bg-muted/15 border border-border/50 rounded-xl p-6 relative">
+                <div className="absolute top-3 left-4 text-[9px] font-extrabold text-muted-foreground tracking-wider uppercase">Lead Volume per Stage</div>
+                {[
+                  { label: "Generated", count: countGenerated, pct: 100, color: "from-blue-500/20 to-blue-500/50 text-blue-500 border-blue-500/30" },
+                  { label: "Contacted", count: countContacted, pct: countGenerated > 0 ? (countContacted / countGenerated) * 100 : 0, color: "from-amber-500/20 to-amber-500/50 text-amber-500 border-amber-500/30" },
+                  { label: "Interested", count: countInterested, pct: countGenerated > 0 ? (countInterested / countGenerated) * 100 : 0, color: "from-[#6366F1]/20 to-[#6366F1]/50 text-primary border-[#6366F1]/30" },
+                  { label: "Clients", count: countClients, pct: countGenerated > 0 ? (countClients / countGenerated) * 100 : 0, color: "from-emerald-500/20 to-emerald-500/50 text-emerald-500 border-emerald-500/30" }
+                ].map((col, i) => (
+                  <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group relative">
+                    <span className="text-[10px] font-extrabold text-foreground mb-1 select-none">{col.count}</span>
+                    <div className="w-full flex-grow flex items-end justify-center relative min-h-[60px] pb-1">
+                      <div 
+                        className={`w-full rounded-t-lg bg-gradient-to-t ${col.color} border-t border-x hover:brightness-105 transition-all shadow-sm`} 
+                        style={{ height: `${Math.max(12, col.pct)}%` }}
+                      >
+                        {/* Light/Themed Tooltip */}
+                        <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-card border border-border text-foreground text-[9px] font-bold py-1 px-2.5 rounded-lg whitespace-nowrap pointer-events-none transition-all z-20 shadow-soft">
+                          {col.pct.toFixed(2)}% of total
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-bold text-muted-foreground select-none text-center block w-full pt-1.5">{col.label}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Conversion Rates Stats */}
+              <div className="md:col-span-4 space-y-3">
+                <div className="p-4 rounded-xl border border-border bg-muted/10 space-y-3">
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Conversion Metrics</span>
+                  
+                  <div className="space-y-2.5 text-xs">
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground font-medium">Contact Rate</span>
+                      <span className="font-extrabold text-foreground">{contactRate.toFixed(2)}%</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground font-medium">Interest Rate</span>
+                      <span className="font-extrabold text-foreground">{interestRate.toFixed(2)}%</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground font-medium">Client Rate</span>
+                      <span className="font-extrabold text-foreground">{clientRate.toFixed(2)}%</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-2.5 border-t border-border/60">
+                      <span className="font-bold text-primary">Overall Lead-to-Client</span>
+                      <span className="font-black text-primary text-sm">{overallRate.toFixed(2)}%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
