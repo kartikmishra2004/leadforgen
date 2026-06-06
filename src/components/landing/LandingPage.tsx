@@ -75,7 +75,7 @@ function Nav() {
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <Container className="flex h-16 items-center justify-between">
         <a href="#" className="flex items-center gap-2">
-          <img src={logo} alt="Lead For Gen" width={40} height={40} className="h-10 w-10 object-contain" />
+          <img src={logo} alt="Lead For Gen" width={32} height={32} className="h-8 w-8 object-contain" />
         </a>
         <nav className="hidden items-center gap-8 md:flex">
           {links.map((link) => (
