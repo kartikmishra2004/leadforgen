@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supbase/client";
 import { Eye, EyeOff, Lock, Mail, Loader2, ArrowRight } from "lucide-react";
+import { TransitionOverlay } from "@/components/ui/transition-overlay";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -62,7 +63,7 @@ export default function LoginPage() {
         setSuccessMsg("Success! Redirecting to dashboard...");
         setTimeout(() => {
           router.push("/dashboard");
-        }, 1200);
+        }, 1800);
       }
     } catch (err: any) {
       setErrorMsg("An unexpected error occurred. Please try again.");
@@ -146,11 +147,13 @@ export default function LoginPage() {
         </div>
       )}
 
-      {successMsg && (
+      {successMsg && !successMsg.includes("Redirecting") && (
         <div className="rounded-xl border border-success/20 bg-success/5 p-3 text-xs font-medium text-success animate-fade-in">
           <p>{successMsg}</p>
         </div>
       )}
+
+      <TransitionOverlay isVisible={successMsg.includes("Redirecting")} />
 
       {/* Login Form */}
       <form onSubmit={handleEmailLogin} className="space-y-4">

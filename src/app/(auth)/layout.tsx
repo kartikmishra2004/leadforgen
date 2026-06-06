@@ -25,7 +25,7 @@ export default function AuthLayout({
       <div className="w-full max-w-[440px] relative z-10 space-y-6">
         <div className="premium-panel bg-card/50 backdrop-blur-xl p-8 sm:p-10 rounded-2xl shadow-soft">
           {/* Logo */}
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-6 auth-logo">
             <Link href="/" className="inline-flex items-center gap-2">
               <img 
                 src="/assets/logo.png" 

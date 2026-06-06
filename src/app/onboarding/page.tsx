@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supbase/client";
 import { Building, Sparkles, Loader2, ArrowRight, Globe, Check } from "lucide-react";
+import { TransitionOverlay } from "@/components/ui/transition-overlay";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -90,7 +91,7 @@ export default function OnboardingPage() {
         setSuccessMsg("Workspace configured! Opening dashboard...");
         setTimeout(() => {
           router.push("/dashboard");
-        }, 1200);
+        }, 1800);
       }
     } catch (err: any) {
       setErrorMsg("An unexpected error occurred. Please try again.");
@@ -205,11 +206,13 @@ export default function OnboardingPage() {
               </div>
             )}
 
-            {successMsg && (
+            {successMsg && !successMsg.includes("configured") && (
               <div className="rounded-xl border border-success/20 bg-success/5 p-3 text-xs font-medium text-success">
                 <p>{successMsg}</p>
               </div>
             )}
+
+            <TransitionOverlay isVisible={successMsg.includes("configured")} />
 
             {/* Form */}
             <form onSubmit={handleOnboardingSubmit} className="space-y-5">

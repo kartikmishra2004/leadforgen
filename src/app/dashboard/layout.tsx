@@ -137,7 +137,7 @@ export default function DashboardLayout({
       rlsErrors,
       setRlsErrors
     }}>
-      <div className="min-h-screen bg-background text-foreground flex">
+      <div className="min-h-screen bg-background text-foreground flex dashboard-root">
         {/* Shared Left Sidebar Navigation */}
         <Sidebar
           activeTab="" // Not used anymore, sidebar will read path

@@ -297,3 +297,14 @@
     animation: none;
   }
 }
+
+.dashboard-root {
+  /* Explicitly override standard Tailwind rounded classes to match the sharper landing page radiuses */
+  .rounded-3xl { border-radius: 12px !important; }
+  .rounded-2xl { border-radius: 8px !important; }
+  .rounded-xl { border-radius: 6px !important; }
+  .rounded-lg { border-radius: 6px !important; }
+  .rounded-md { border-radius: 4px !important; }
+  .rounded { border-radius: 4px !important; }
+  .rounded-sm { border-radius: 3px !important; }
+}
