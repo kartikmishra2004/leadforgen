@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "LeadForGen - All-in-One Lead Gen & Service Business Platform",
+  title: "Lead For Gen - All-in-One Lead Gen & Service Business Platform",
   description:
     "Capture leads, book appointments, send quotes, manage customers, and automate with AI. The all-in-one platform for local service businesses.",
-  authors: [{ name: "LeadForGen" }],
+  authors: [{ name: "Lead For Gen" }],
   openGraph: {
-    title: "LeadForGen - Run Your Entire Service Business From One Platform",
+    title: "Lead For Gen - Run Your Entire Service Business From One Platform",
     description:
       "Lead generation, booking, quoting, CRM, AI assistant, and white-labeled websites in one platform.",
     type: "website",

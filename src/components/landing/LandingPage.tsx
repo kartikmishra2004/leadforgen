@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowRight, Bot, Check, Menu, Sparkles, Star, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { ArrowRight, Bot, Check, Menu, Sparkles, Star, X, LogOut } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
+import { supabase } from "@/lib/supbase/client";
+import { cn } from "@/lib/utils";
 
 const dashboardHero = "/assets/dashboard-hero.png";
 const aiVisual = "/assets/ai-visual.jpg";
@@ -23,20 +26,20 @@ const SectionLabel = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-const GradientButton = ({ children, ...props }: React.ComponentProps<"button">) => (
+const GradientButton = ({ children, className, ...props }: React.ComponentProps<"button">) => (
   <button
     {...props}
-    className="group inline-flex h-12 items-center justify-center gap-2 rounded-lg gradient-brand-bg px-7 text-sm font-semibold text-primary-foreground shadow-glow transition-transform hover:scale-[1.02] active:scale-[0.99]"
+    className={cn("group inline-flex h-12 items-center justify-center gap-2 rounded-lg gradient-brand-bg px-7 text-sm font-semibold text-primary-foreground shadow-glow transition-transform hover:scale-[1.02] active:scale-[0.99]", className)}
   >
     {children}
     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
   </button>
 );
 
-const GhostButton = ({ children, ...props }: React.ComponentProps<"button">) => (
+const GhostButton = ({ children, className, ...props }: React.ComponentProps<"button">) => (
   <button
     {...props}
-    className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-border bg-card/70 px-7 text-sm font-semibold text-foreground backdrop-blur transition-colors hover:bg-card"
+    className={cn("inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-border bg-card/70 px-7 text-sm font-semibold text-foreground backdrop-blur transition-colors hover:bg-card", className)}
   >
     {children}
   </button>
@@ -44,13 +47,35 @@ const GhostButton = ({ children, ...props }: React.ComponentProps<"button">) => 
 
 function Nav() {
   const [open, setOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const links = ["Features", "Industries", "Pricing", "FAQ"];
+
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setIsLoggedIn(!!session?.user);
+      } catch (err) {
+        console.error("Failed to query session", err);
+      }
+    }
+    checkSession();
+  }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      setIsLoggedIn(false);
+    } catch (err) {
+      console.error("Failed to sign out", err);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <Container className="flex h-16 items-center justify-between">
         <a href="#" className="flex items-center gap-2">
-          <img src={logo} alt="LeadForGen" width={40} height={40} className="h-10 w-10 object-contain" />
+          <img src={logo} alt="Lead For Gen" width={40} height={40} className="h-10 w-10 object-contain" />
         </a>
         <nav className="hidden items-center gap-8 md:flex">
           {links.map((link) => (
@@ -60,8 +85,20 @@ function Nav() {
           ))}
         </nav>
         <div className="hidden items-center gap-3 md:flex">
-          <button className="text-sm font-medium text-muted-foreground hover:text-foreground">Sign in</button>
-          <GradientButton>Start Free Trial</GradientButton>
+          {isLoggedIn ? (
+            <Link href="/dashboard">
+              <GradientButton className="h-10 px-5.5 text-xs">Dashboard</GradientButton>
+            </Link>
+          ) : (
+            <>
+              <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+                Sign in
+              </Link>
+              <Link href="/signup">
+                <GradientButton className="h-10 px-5.5 text-xs">Start Free Trial</GradientButton>
+              </Link>
+            </>
+          )}
         </div>
         <button className="md:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
           <Menu className="h-6 w-6" />
@@ -73,7 +110,20 @@ function Nav() {
             {links.map((link) => (
               <a key={link} href={`#${link.toLowerCase()}`} className="text-sm font-medium">{link}</a>
             ))}
-            <GradientButton>Start Free Trial</GradientButton>
+            {isLoggedIn ? (
+              <Link href="/dashboard" className="w-full">
+                <GradientButton className="w-full h-10 text-xs">Dashboard</GradientButton>
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground py-1 text-center">
+                  Sign in
+                </Link>
+                <Link href="/signup" className="w-full">
+                  <GradientButton className="w-full h-10 text-xs">Start Free Trial</GradientButton>
+                </Link>
+              </>
+            )}
           </Container>
         </div>
       )}
@@ -108,7 +158,7 @@ function Hero() {
             <span className="font-serif-display italic gradient-text">Book&nbsp;Faster</span>
             <br />
             <span className="font-extrabold">with </span>
-            <span className="font-extrabold gradient-text">LeadForGen</span>
+            <span className="font-extrabold gradient-text">Lead For Gen</span>
           </h1>
 
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
@@ -139,7 +189,7 @@ function Hero() {
           </div>
         </div>
 
-        <img src={dashboardHero} alt="LeadForGen dashboard" width={1920} height={1080} className="mx-auto mt-16 w-full max-w-6xl" />
+        <img src={dashboardHero} alt="Lead For Gen dashboard" width={1920} height={1080} className="mx-auto mt-16 w-full max-w-6xl" />
       </Container>
     </section>
   );
@@ -206,7 +256,7 @@ function Problem() {
               </div>
               <div className="rounded-md bg-muted/70 p-4">
                 <p className="text-sm font-semibold">
-                  LeadForGen replaces the patchwork with a single conversion system from first visit to booked customer.
+                  Lead For Gen replaces the patchwork with a single conversion system from first visit to booked customer.
                 </p>
               </div>
             </div>
@@ -221,7 +271,7 @@ function HowItWorks() {
   const steps = [
     ["Website visit", "High-intent visitors land on a branded service page."],
     ["Instant capture", "Booking and quote requests become structured leads."],
-    ["AI triage", "LeadForGen qualifies, routes, and drafts the next best action."],
+    ["AI triage", "Lead For Gen qualifies, routes, and drafts the next best action."],
     ["Revenue action", "Your team confirms, quotes, and wins from one workspace."],
   ];
 
@@ -339,7 +389,7 @@ function WebsiteBuilder() {
                 <span className="h-2.5 w-2.5 rounded-full bg-destructive/70" />
                 <span className="h-2.5 w-2.5 rounded-full bg-accent" />
                 <span className="h-2.5 w-2.5 rounded-full bg-primary" />
-                <span className="ml-3 rounded-md bg-muted px-3 py-1 text-xs text-muted-foreground">leadforgen.in/dashboard/builder</span>
+                <span className="ml-3 rounded-md bg-muted px-3 py-1 text-xs text-muted-foreground">leadforgen.in/dashboard/website</span>
               </div>
               <div className="grid gap-0 lg:grid-cols-[0.72fr_0.28fr]">
                 <img src={websiteBuilder} alt="Website builder" width={1400} height={1000} loading="lazy" className="h-full w-full object-cover" />
@@ -509,7 +559,7 @@ function Benefits() {
             <h2 className="mt-6 text-4xl font-bold sm:text-5xl">Outcomes leadership can actually track.</h2>
           </div>
           <p className="max-w-xl text-lg text-muted-foreground">
-            LeadForGen turns front-office activity into visible growth signals, from first response to booked revenue.
+            Lead For Gen turns front-office activity into visible growth signals, from first response to booked revenue.
           </p>
         </div>
         <div className="mt-14 grid gap-4 lg:grid-cols-3">
@@ -549,7 +599,7 @@ function Comparison() {
         <div className="mx-auto mt-12 max-w-5xl overflow-hidden rounded-md border border-border bg-card shadow-card">
           <div className="grid grid-cols-[1.1fr_0.9fr_0.9fr] border-b border-border bg-muted/50">
             <div className="p-5 font-bold">Feature</div>
-            <div className="p-5 text-center font-bold gradient-text">LeadForGen</div>
+            <div className="p-5 text-center font-bold gradient-text">Lead For Gen</div>
             <div className="p-5 text-center font-bold text-muted-foreground">Traditional Setup</div>
           </div>
           {rows.map(([feature, ours, theirs]) => (
@@ -638,9 +688,8 @@ function Pricing() {
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative rounded-md border p-8 shadow-card transition-all hover:-translate-y-1 ${
-                plan.popular ? "border-transparent bg-card shadow-glow ring-2 ring-primary" : "border-border bg-card"
-              }`}
+              className={`relative rounded-md border p-8 shadow-card transition-all hover:-translate-y-1 ${plan.popular ? "border-transparent bg-card shadow-glow ring-2 ring-primary" : "border-border bg-card"
+                }`}
             >
               {plan.popular && (
                 <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 gradient-brand-bg text-primary-foreground">Most Popular</Badge>
@@ -659,7 +708,9 @@ function Pricing() {
                 ))}
               </ul>
               <div className="mt-8">
-                {plan.popular ? <GradientButton>Start Free Trial</GradientButton> : <GhostButton>Start Free Trial</GhostButton>}
+                <Link href="/signup">
+                  {plan.popular ? <GradientButton>Start Free Trial</GradientButton> : <GhostButton>Start Free Trial</GhostButton>}
+                </Link>
               </div>
             </div>
           ))}
@@ -671,7 +722,7 @@ function Pricing() {
 
 function FAQ() {
   const qs = [
-    ["What is LeadForGen?", "An all-in-one platform that combines a website builder, CRM, appointment booking, quoting, customer management, and AI automation built for local service businesses."],
+    ["What is Lead For Gen?", "An all-in-one platform that combines a website builder, CRM, appointment booking, quoting, customer management, and AI automation built for local service businesses."],
     ["Do I need technical skills?", "No. Everything is no-code. Launch your branded website and start capturing leads in minutes."],
     ["Can I use my own domain?", "Yes. Connect any custom domain on Growth and Pro plans."],
     ["Does it support appointment booking?", "Yes. Real-time calendar booking with confirmations, reminders, and rescheduling."],
@@ -718,7 +769,9 @@ function FinalCTA() {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <GradientButton>Start Free Trial</GradientButton>
+              <Link href="/signup">
+                <GradientButton>Start Free Trial</GradientButton>
+              </Link>
               <GhostButton>Schedule Demo</GhostButton>
             </div>
           </div>
@@ -742,8 +795,8 @@ function Footer() {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2">
-              <img src={logo} alt="LeadForGen" width={36} height={36} className="h-9 w-9 object-contain" />
-              <span className="text-lg font-bold">LeadForGen</span>
+              <img src={logo} alt="Lead For Gen" width={36} height={36} className="h-9 w-9 object-contain" />
+              <span className="text-lg font-bold">Lead For Gen</span>
             </div>
             <p className="mt-4 max-w-sm text-sm text-muted-foreground">
               One platform to generate leads, manage customers, book appointments, send quotes, and grow your service business with AI.
@@ -761,7 +814,7 @@ function Footer() {
           ))}
         </div>
         <div className="mt-12 border-t border-border pt-6 text-center text-sm text-muted-foreground">
-          (c) {new Date().getFullYear()} LeadForGen. All rights reserved.
+          (c) {new Date().getFullYear()} Lead For Gen. All rights reserved.
         </div>
       </Container>
     </footer>

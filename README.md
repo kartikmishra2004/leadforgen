@@ -1,4 +1,4 @@
-# Leadforgen
+# Lead For Gen
 
 ## Getting started
 
