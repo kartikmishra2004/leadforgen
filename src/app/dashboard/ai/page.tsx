@@ -288,8 +288,8 @@ export default function AIAssistantPage() {
 
   const starterPrompts = [
     { text: "create appointment", action: "Create an appointment" },
-    { text: "search customer Kartik", action: "Search customers" },
-    { text: "check slot availability for tomorrow", action: "Check slot availability" }
+    { text: "search customer", action: "Search customers" },
+    { text: "check slot availability for tomorrow", action: "Check slot availability for tomorrow" }
   ];
 
   // Helper to check and render special data structure
