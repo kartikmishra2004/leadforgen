@@ -50,7 +50,7 @@ export function Sidebar({ onSignOut, businessName, isCollapsed = false, setIsCol
     { id: "quotes", label: "Quotes", icon: FileText, href: "/dashboard/quotes" },
     { id: "customers", label: "Customers", icon: Users, href: "/dashboard/customers" },
     { id: "website", label: "Website Builder", icon: Globe, href: "/dashboard/website" },
-    { id: "ai", label: "AI Assistant", icon: Bot, href: "/dashboard/ai" },
+    { id: "ai", label: "Kai Assistant", icon: Bot, href: "/dashboard/ai" },
   ];
 
   return (
