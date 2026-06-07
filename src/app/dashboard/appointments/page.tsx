@@ -354,20 +354,6 @@ export default function AppointmentsPage() {
                 </select>
               </div>
 
-              <div className="space-y-1">
-                <label className="font-bold text-muted-foreground">Select Service Tier</label>
-                <select
-                  value={formServiceId}
-                  onChange={(e) => setFormServiceId(e.target.value)}
-                  className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl focus:outline-none focus:ring-1 focus:ring-primary text-foreground appearance-none"
-                >
-                  <option value="">General Consultation / Assessment</option>
-                  {services.map((s) => (
-                    <option key={s.id} value={s.id}>{s.name} - ${s.starting_price}</option>
-                  ))}
-                </select>
-              </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="font-bold text-muted-foreground">Date *</label>
