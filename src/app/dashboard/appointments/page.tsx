@@ -3,16 +3,14 @@
 import React, { useState, useEffect } from "react";
 import { useWorkspace } from "../layout";
 import { supabase } from "@/lib/supbase/client";
-import { 
-  Calendar as CalendarIcon, 
-  Clock, 
-  Plus, 
-  X, 
-  AlertCircle, 
-  Trash2, 
-  Check, 
-  User, 
-  Briefcase 
+import {
+  Calendar as CalendarIcon,
+  Clock,
+  Plus,
+  X,
+  AlertCircle,
+  Trash2,
+  User,
 } from "lucide-react";
 
 export default function AppointmentsPage() {
@@ -26,7 +24,6 @@ export default function AppointmentsPage() {
 
   // Form states
   const [formCustomerId, setFormCustomerId] = useState("");
-  const [formServiceId, setFormServiceId] = useState("");
   const [formTitle, setFormTitle] = useState("");
   const [formDate, setFormDate] = useState("");
   const [formTime, setFormTime] = useState("");
@@ -93,7 +90,6 @@ export default function AppointmentsPage() {
     const newApptItem = {
       organization_id: orgId,
       customer_id: formCustomerId || null,
-      service_id: formServiceId || null,
       title: formTitle,
       appointment_date: apptDateTime,
       status: "scheduled",
@@ -111,7 +107,6 @@ export default function AppointmentsPage() {
       } else if (data && data[0]) {
         setAppointments(prev => [...prev, data[0]]);
         setFormCustomerId("");
-        setFormServiceId("");
         setFormTitle("");
         setFormDate("");
         setFormTime("");
@@ -130,7 +125,7 @@ export default function AppointmentsPage() {
         .from("appointments")
         .update({ status: "cancelled" })
         .eq("id", apptId);
-      
+
       if (error) {
         alert(`Cancel failed: ${error.message}`);
         return;
@@ -149,7 +144,7 @@ export default function AppointmentsPage() {
         .from("appointments")
         .delete()
         .eq("id", apptId);
-      
+
       if (error) {
         alert(`Delete failed: ${error.message}`);
         return;
@@ -172,7 +167,7 @@ export default function AppointmentsPage() {
           </div>
           <div className="h-8 w-36 bg-slate-200 rounded-xl" />
         </div>
-        
+
         {/* Grid of appointment cards skeletons */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
@@ -238,13 +233,13 @@ export default function AppointmentsPage() {
             const apptDateObj = new Date(appt.appointment_date);
 
             return (
-              <div 
-                key={appt.id} 
+              <div
+                key={appt.id}
                 className={`bg-card border border-border rounded-2xl p-5 shadow-soft space-y-4 flex flex-col justify-between relative overflow-hidden
                   ${appt.status === "cancelled" ? "opacity-60 bg-muted/10" : ""}`}
               >
                 <div className={`absolute top-0 left-0 right-0 h-1 
-                  ${appt.status === "cancelled" ? "bg-red-500/40" : "bg-gradient-to-r from-[#6366F1] to-[#EC4899]"}`} 
+                  ${appt.status === "cancelled" ? "bg-red-500/40" : "bg-gradient-to-r from-[#6366F1] to-[#EC4899]"}`}
                 />
 
                 <div className="space-y-3">
@@ -254,9 +249,9 @@ export default function AppointmentsPage() {
                       <p className="text-[10px] text-muted-foreground mt-0.5">{service.name}</p>
                     </div>
                     <span className={`text-[8px] font-bold px-2 py-0.5 rounded-full capitalize border
-                      ${appt.status === "scheduled" ? "bg-blue-500/10 text-blue-500 border border-blue-500/10" : 
-                        appt.status === "completed" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/10" : 
-                        "bg-red-500/10 text-red-500 border border-red-500/10"}`}
+                      ${appt.status === "scheduled" ? "bg-blue-500/10 text-blue-500 border border-blue-500/10" :
+                        appt.status === "completed" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/10" :
+                          "bg-red-500/10 text-red-500 border border-red-500/10"}`}
                     >
                       {appt.status}
                     </span>
