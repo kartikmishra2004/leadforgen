@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supbase/client";
 import { Sidebar } from "./components/Sidebar";
 import { Header } from "./components/Header";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertTriangle, CheckCircle2, Info, XCircle, HelpCircle } from "lucide-react";
 
 // Define the shape of our shared Workspace Context
 interface WorkspaceContextType {
@@ -15,6 +15,8 @@ interface WorkspaceContextType {
   setCurrentOrg: (org: any) => void;
   rlsErrors: string[];
   setRlsErrors: React.Dispatch<React.SetStateAction<string[]>>;
+  showAlert: (message: string, title?: string, type?: "info" | "success" | "error" | "warning") => Promise<void>;
+  showConfirm: (message: string, title?: string, options?: { confirmText?: string; cancelText?: string; variant?: "default" | "destructive" }) => Promise<boolean>;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextType | null>(null);
@@ -41,6 +43,18 @@ export default function DashboardLayout({
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
+  // Dialog State
+  const [dialog, setDialog] = useState<{
+    type: "alert" | "confirm";
+    title: string;
+    message: string;
+    alertType?: "info" | "success" | "error" | "warning";
+    confirmText?: string;
+    cancelText?: string;
+    variant?: "default" | "destructive";
+    resolve: (value?: any) => void;
+  } | null>(null);
+
   // Load initial collapsed state on mount
   useEffect(() => {
     try {
@@ -52,6 +66,34 @@ export default function DashboardLayout({
       console.error(e);
     }
   }, []);
+
+  // Keyboard support for custom dialogs
+  useEffect(() => {
+    if (!dialog) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        if (dialog.type === "confirm") {
+          dialog.resolve(false);
+        } else {
+          dialog.resolve();
+        }
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (dialog.type === "confirm") {
+          dialog.resolve(true);
+        } else {
+          dialog.resolve();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [dialog]);
 
   // Authenticate user and fetch owned organizations
   useEffect(() => {
@@ -105,6 +147,69 @@ export default function DashboardLayout({
     router.push("/login");
   };
 
+  const showAlert = (
+    message: string,
+    title: string = "Notification",
+    type: "info" | "success" | "error" | "warning" = "info"
+  ) => {
+    return new Promise<void>((resolve) => {
+      setDialog({
+        type: "alert",
+        title,
+        message,
+        alertType: type,
+        confirmText: "OK",
+        resolve: () => {
+          setDialog(null);
+          resolve();
+        },
+      });
+    });
+  };
+
+  const showConfirm = (
+    message: string,
+    title: string = "Confirm Action",
+    options?: { confirmText?: string; cancelText?: string; variant?: "default" | "destructive" }
+  ) => {
+    return new Promise<boolean>((resolve) => {
+      setDialog({
+        type: "confirm",
+        title,
+        message,
+        confirmText: options?.confirmText || "Confirm",
+        cancelText: options?.cancelText || "Cancel",
+        variant: options?.variant || "default",
+        resolve: (value: boolean) => {
+          setDialog(null);
+          resolve(value);
+        },
+      });
+    });
+  };
+
+  const renderDialogIcon = () => {
+    if (!dialog) return null;
+    if (dialog.type === "alert") {
+      switch (dialog.alertType) {
+        case "success":
+          return <CheckCircle2 className="h-5 w-5 text-emerald-500" />;
+        case "error":
+          return <XCircle className="h-5 w-5 text-red-500" />;
+        case "warning":
+          return <AlertTriangle className="h-5 w-5 text-amber-500" />;
+        case "info":
+        default:
+          return <Info className="h-5 w-5 text-[#6366F1]" />;
+      }
+    } else {
+      if (dialog.variant === "destructive") {
+        return <AlertTriangle className="h-5 w-5 text-red-500" />;
+      }
+      return <HelpCircle className="h-5 w-5 text-[#6366F1]" />;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#070913] flex items-center justify-center relative overflow-hidden">
@@ -135,7 +240,9 @@ export default function DashboardLayout({
       currentOrg,
       setCurrentOrg,
       rlsErrors,
-      setRlsErrors
+      setRlsErrors,
+      showAlert,
+      showConfirm
     }}>
       <div className="min-h-screen bg-background text-foreground flex dashboard-root">
         {/* Shared Left Sidebar Navigation */}
@@ -159,11 +266,61 @@ export default function DashboardLayout({
             onChangeOrg={handleOrgChange}
           />
 
-          <main className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full">
+          <main className="flex-1 px-3 py-6 md:p-8 max-w-7xl mx-auto w-full">
             {children}
           </main>
         </div>
       </div>
+
+      {/* Custom Promise-Based Dashboard Dialog Overlay */}
+      {dialog && (
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-card border border-border rounded-2xl w-full max-w-sm p-5 space-y-4 shadow-xl bubble-pop">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-muted/40 rounded-xl shrink-0 mt-0.5">
+                {renderDialogIcon()}
+              </div>
+              <div className="space-y-1 flex-1 min-w-0">
+                <h3 className="text-sm font-bold text-foreground tracking-tight leading-normal">
+                  {dialog.title}
+                </h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {dialog.message}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex gap-2 justify-end pt-1">
+              {dialog.type === "confirm" && (
+                <button
+                  type="button"
+                  onClick={() => dialog.resolve(false)}
+                  className="px-3.5 py-1.5 border border-border text-foreground font-bold hover:bg-muted/40 rounded-xl text-xs transition-colors cursor-pointer"
+                >
+                  {dialog.cancelText}
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  if (dialog.type === "confirm") {
+                    dialog.resolve(true);
+                  } else {
+                    dialog.resolve();
+                  }
+                }}
+                className={`px-4 py-1.5 text-white font-bold rounded-xl text-xs shadow-md transition-all cursor-pointer ${
+                  dialog.type === "confirm" && dialog.variant === "destructive"
+                    ? "bg-red-500 hover:bg-red-600 active:scale-[0.98]"
+                    : "bg-[#6366F1] hover:bg-[#4F46E5] active:scale-[0.98]"
+                }`}
+              >
+                {dialog.confirmText}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </WorkspaceContext.Provider>
   );
 }

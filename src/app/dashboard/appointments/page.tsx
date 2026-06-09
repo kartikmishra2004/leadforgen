@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 export default function AppointmentsPage() {
-  const { currentOrg, setRlsErrors } = useWorkspace();
+  const { currentOrg, setRlsErrors, showAlert, showConfirm } = useWorkspace();
   const [appointments, setAppointments] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
@@ -119,7 +119,7 @@ export default function AppointmentsPage() {
   };
 
   const handleCancelAppt = async (apptId: string) => {
-    if (!confirm("Are you sure you want to cancel this appointment?")) return;
+    if (!await showConfirm("Are you sure you want to cancel this appointment?", "Cancel Appointment", { variant: "destructive" })) return;
     try {
       const { error } = await supabase
         .from("appointments")
@@ -127,7 +127,7 @@ export default function AppointmentsPage() {
         .eq("id", apptId);
 
       if (error) {
-        alert(`Cancel failed: ${error.message}`);
+        await showAlert(`Cancel failed: ${error.message}`, "Error", "error");
         return;
       }
     } catch (err) {
@@ -138,7 +138,7 @@ export default function AppointmentsPage() {
   };
 
   const handleDeleteAppt = async (apptId: string) => {
-    if (!confirm("Are you sure you want to delete this appointment?")) return;
+    if (!await showConfirm("Are you sure you want to delete this appointment?", "Delete Appointment", { variant: "destructive" })) return;
     try {
       const { error } = await supabase
         .from("appointments")
@@ -146,7 +146,7 @@ export default function AppointmentsPage() {
         .eq("id", apptId);
 
       if (error) {
-        alert(`Delete failed: ${error.message}`);
+        await showAlert(`Delete failed: ${error.message}`, "Error", "error");
         return;
       }
     } catch (err) {

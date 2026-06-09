@@ -140,6 +140,37 @@ export default function DashboardOverview() {
     .reduce((sum, q) => sum + Number(q.amount || 0), 0);
   const aiChatsCount = aiConversations.length;
 
+  // Dynamic Mini Calendar Logic
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth(); // 0-indexed
+  const todayDate = today.getDate();
+
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  const currentMonthName = monthNames[currentMonth];
+
+  // First day of current month
+  const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+  const firstDayOfWeek = firstDayOfMonth.getDay(); // 0 = Sunday, 1 = Monday
+  // Align Monday as first column (index 0)
+  const mondayFirstIndex = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+  const prevMonthDays = Array.from(
+    { length: mondayFirstIndex },
+    (_, i) => daysInPrevMonth - mondayFirstIndex + 1 + i
+  );
+  const currentMonthDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+  const totalCells = mondayFirstIndex + daysInMonth;
+  const nextMonthPaddingCount = totalCells > 35 ? 42 - totalCells : 35 - totalCells;
+  const nextMonthDays = Array.from({ length: nextMonthPaddingCount }, (_, i) => i + 1);
+
   const pipelineStages = [
     { id: "new", label: "Leads Generated", bgLight: "bg-blue-500/10", text: "text-blue-500" },
     { id: "contacted", label: "Contacted", bgLight: "bg-amber-500/10", text: "text-amber-500" },
@@ -395,7 +426,7 @@ export default function DashboardOverview() {
             {/* Custom Interactive Mini Month Calendar (approx 60% height) */}
             <div className="border border-border/60 rounded-xl p-3 bg-muted/15 h-[265px] flex flex-col justify-between shrink-0">
               <div className="flex items-center justify-between border-b border-border/50 pb-1.5 shrink-0">
-                <span className="text-[11px] font-bold text-foreground">June 2026</span>
+                <span className="text-[11px] font-bold text-foreground">{currentMonthName} {currentYear}</span>
                 <span className="text-[9px] font-bold text-muted-foreground uppercase">Schedule</span>
               </div>
               <div className="grid grid-cols-7 gap-1 text-center flex-grow items-center">
@@ -403,15 +434,35 @@ export default function DashboardOverview() {
                   <span key={i} className="text-[9px] font-bold text-muted-foreground">{d}</span>
                 ))}
                 
-                {[1, 2, 3, 4, 5].map((d) => (
-                  <span key={d} className="text-[10px] py-1 text-muted-foreground/50 flex items-center justify-center font-medium">{d}</span>
+                {prevMonthDays.map((d, idx) => (
+                  <span key={`prev-${idx}`} className="text-[10px] py-1 text-muted-foreground/30 flex items-center justify-center font-medium select-none">{d}</span>
                 ))}
-                <span className="text-[10px] py-1 bg-[#6366F1] text-white font-bold rounded-lg shadow-md shadow-[#6366F1]/20 flex items-center justify-center">6</span>
-                {[7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((d) => {
+
+                {currentMonthDays.map((d) => {
+                  const isToday = d === todayDate;
                   const hasAppt = appointments.some(appt => {
                     const date = new Date(appt.appointment_date);
-                    return date.getMonth() === 5 && date.getDate() === d && appt.status !== "cancelled";
+                    return date.getFullYear() === currentYear && 
+                           date.getMonth() === currentMonth && 
+                           date.getDate() === d && 
+                           appt.status !== "cancelled";
                   });
+
+                  if (isToday) {
+                    return (
+                      <Link
+                        key={d}
+                        href="/dashboard/appointments"
+                        className="text-[10px] py-1 bg-[#6366F1] text-white font-bold rounded-lg shadow-md shadow-[#6366F1]/20 flex items-center justify-center relative cursor-pointer font-extrabold"
+                      >
+                        {d}
+                        {hasAppt && (
+                          <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-white" />
+                        )}
+                      </Link>
+                    );
+                  }
+
                   return (
                     <Link 
                       key={d} 
@@ -426,6 +477,10 @@ export default function DashboardOverview() {
                     </Link>
                   );
                 })}
+
+                {nextMonthDays.map((d, idx) => (
+                  <span key={`next-${idx}`} className="text-[10px] py-1 text-muted-foreground/30 flex items-center justify-center font-medium select-none">{d}</span>
+                ))}
               </div>
             </div>
 

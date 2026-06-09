@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 
 export default function QuotesPage() {
-  const { currentOrg, setRlsErrors } = useWorkspace();
+  const { currentOrg, setRlsErrors, showAlert, showConfirm } = useWorkspace();
   const [quotes, setQuotes] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -116,7 +116,7 @@ export default function QuotesPage() {
         .eq("id", quoteId);
       
       if (error) {
-        alert(`Failed to update status: ${error.message}`);
+        await showAlert(`Failed to update status: ${error.message}`, "Error", "error");
         return;
       }
     } catch (err) {
@@ -127,7 +127,7 @@ export default function QuotesPage() {
   };
 
   const handleDeleteQuote = async (quoteId: string) => {
-    if (!confirm("Are you sure you want to delete this quote record?")) return;
+    if (!await showConfirm("Are you sure you want to delete this quote record?", "Delete Quote", { variant: "destructive" })) return;
     try {
       const { error } = await supabase
         .from("quotes")
@@ -135,7 +135,7 @@ export default function QuotesPage() {
         .eq("id", quoteId);
       
       if (error) {
-        alert(`Failed to delete quote: ${error.message}`);
+        await showAlert(`Failed to delete quote: ${error.message}`, "Error", "error");
         return;
       }
     } catch (err) {

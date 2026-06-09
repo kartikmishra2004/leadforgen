@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supbase/client";
 import { Users, Search, Plus, X, AlertCircle, Phone, Mail, MapPin, Trash2, Clock } from "lucide-react";
 
 export default function CustomersPage() {
-  const { currentOrg, setRlsErrors } = useWorkspace();
+  const { currentOrg, setRlsErrors, showAlert, showConfirm } = useWorkspace();
   const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -86,7 +86,7 @@ export default function CustomersPage() {
   };
 
   const handleDeleteCust = async (custId: string) => {
-    if (!confirm("Are you sure you want to delete this customer profile?")) return;
+    if (!await showConfirm("Are you sure you want to delete this customer profile?", "Delete Profile", { variant: "destructive" })) return;
     try {
       const { error } = await supabase
         .from("customers")
@@ -94,7 +94,7 @@ export default function CustomersPage() {
         .eq("id", custId);
       
       if (error) {
-        alert(`Failed to delete profile: ${error.message}`);
+        await showAlert(`Failed to delete profile: ${error.message}`, "Error", "error");
         return;
       }
     } catch (err) {

@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 export default function LeadsPage() {
-  const { currentOrg, setRlsErrors } = useWorkspace();
+  const { currentOrg, setRlsErrors, showAlert, showConfirm } = useWorkspace();
   const [leads, setLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -113,7 +113,7 @@ export default function LeadsPage() {
         .eq("id", leadId);
 
       if (error) {
-        alert(`Failed to update status: ${error.message}`);
+        await showAlert(`Failed to update status: ${error.message}`, "Error", "error");
         return;
       }
     } catch (err) {
@@ -139,7 +139,7 @@ export default function LeadsPage() {
         .eq("id", leadId);
 
       if (error) {
-        alert(`Failed to add note: ${error.message}`);
+        await showAlert(`Failed to add note: ${error.message}`, "Error", "error");
         return;
       }
     } catch (err) {
@@ -152,7 +152,7 @@ export default function LeadsPage() {
   };
 
   const handleDeleteLead = async (leadId: string) => {
-    if (!confirm("Are you sure you want to delete this lead?")) return;
+    if (!await showConfirm("Are you sure you want to delete this lead?", "Delete Lead", { variant: "destructive" })) return;
     try {
       const { error } = await supabase
         .from("leads")
@@ -160,7 +160,7 @@ export default function LeadsPage() {
         .eq("id", leadId);
 
       if (error) {
-        alert(`Failed to delete: ${error.message}`);
+        await showAlert(`Failed to delete: ${error.message}`, "Error", "error");
         return;
       }
     } catch (err) {

@@ -3,26 +3,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useWorkspace } from "../layout";
 import {
-  Bot,
   Sparkles,
-  ArrowRight,
-  MessageSquare,
-  Calendar,
-  Clock,
-  Trash2,
   Send,
   CheckCircle,
   Copy,
   Check,
   User,
-  AlertCircle,
   Plus,
-  Mic,
-  ThumbsUp,
-  ThumbsDown,
-  Share2,
-  RefreshCw,
-  MoreHorizontal
+  RefreshCw
 } from "lucide-react";
 
 // Message interface
@@ -34,14 +22,7 @@ interface Message {
 }
 
 export default function AIAssistantPage() {
-  const { currentOrg, user } = useWorkspace();
-  const userFullName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Operator Pro";
-  const userInitials = userFullName
-    .split(/\s+/)
-    .map((n: string) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  const { currentOrg } = useWorkspace();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -167,7 +148,7 @@ export default function AIAssistantPage() {
         clearInterval(timer);
         setIsStreaming(false);
       }
-    }, 25);
+    }, 8);
   };
 
   const handleSendMessage = async (textToSend: string) => {
@@ -229,9 +210,6 @@ export default function AIAssistantPage() {
     }
   };
 
-  const handleClearHistory = () => {
-    setMessages([]);
-  };
 
   const handleRegenerateMessage = async (index: number) => {
     if (isLoading || isStreaming || index < 1) return;
@@ -305,49 +283,21 @@ export default function AIAssistantPage() {
     if (data.appointment_date && data.status !== "error") {
       const apptDate = new Date(data.appointment_date);
       return (
-        <div className="mt-3.5 p-4 rounded-xl border border-primary/20 bg-primary/5 shadow-inner space-y-3 max-w-full animate-reveal-up text-xs">
-          <div className="flex items-center justify-between border-b border-primary/10 pb-2">
-            <span className="font-bold text-primary flex items-center gap-1.5">
-              <CheckCircle className="h-4 w-4 text-emerald-500" />
-              Appointment Booked Successfully
-            </span>
-            <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold border border-emerald-500/20 capitalize">
-              {data.status || "scheduled"}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-            <div className="space-y-1">
-              <span className="block text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Subject / Title</span>
-              <span className="font-bold text-foreground">{data.title || "Untitled Appointment"}</span>
+        <div className="mt-2.5 p-3 rounded-xl border border-border bg-card/50 shadow-soft max-w-full animate-reveal-up text-xs flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="p-1.5 bg-emerald-500/10 text-emerald-500 rounded-lg shrink-0">
+              <CheckCircle className="h-4 w-4" />
             </div>
-
-            <div className="space-y-1">
-              <span className="block text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Date & Time</span>
-              <span className="font-bold text-foreground flex items-center gap-1">
-                <Calendar className="h-3 w-3 text-primary" />
-                {apptDate.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
-                <span className="text-muted-foreground">@</span>
-                <Clock className="h-3 w-3 text-primary" />
-                {apptDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
-              </span>
-            </div>
-
-            <div className="space-y-1">
-              <span className="block text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Appointment ID</span>
-              <span className="font-mono text-[10px] text-foreground/80 truncate block max-w-[180px]">{data.id || "N/A"}</span>
-            </div>
-
-            <div className="space-y-1">
-              <span className="block text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Organization ID</span>
-              <span className="font-mono text-[10px] text-foreground/80 truncate block max-w-[180px]">{data.organization_id || "N/A"}</span>
+            <div className="min-w-0">
+              <h4 className="font-bold text-foreground truncate">{data.title || "Appointment Booked"}</h4>
+              <p className="text-[10px] text-muted-foreground truncate">
+                {apptDate.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })} at {apptDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+              </p>
             </div>
           </div>
-
-          <div className="pt-2 border-t border-border flex items-center justify-between text-[10px] text-muted-foreground">
-            <span>CRM Database Status: Synced</span>
-            <span className="text-[9px] text-emerald-500 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded">Real-Time Sync Active</span>
-          </div>
+          <span className="shrink-0 text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20 capitalize">
+            {data.status || "scheduled"}
+          </span>
         </div>
       );
     }
@@ -355,8 +305,8 @@ export default function AIAssistantPage() {
     // 3. If it's a list of customer search results (Array)
     if (Array.isArray(data) && data.length > 0) {
       return (
-        <div className="mt-3.5 p-4 rounded-xl border border-border bg-card/60 shadow-soft space-y-2.5 max-w-full animate-reveal-up text-xs">
-          <div className="font-bold text-foreground/80 border-b border-border pb-1.5 flex items-center gap-1.5">
+        <div className="mt-2.5 p-3 sm:p-4 rounded-xl border border-border bg-card/60 shadow-soft space-y-2 sm:space-y-2.5 max-w-full animate-reveal-up text-xs">
+          <div className="font-bold text-foreground/80 border-b border-border pb-1 flex items-center gap-1.5">
             <User className="h-4 w-4 text-primary" />
             Matching Customers ({data.length})
           </div>
@@ -382,8 +332,8 @@ export default function AIAssistantPage() {
     // 4. If it's a single customer profile
     if (data.name && (data.email || data.phone) && !data.appointment_date) {
       return (
-        <div className="mt-3.5 p-4 rounded-xl border border-border bg-card/60 shadow-soft space-y-2.5 max-w-full animate-reveal-up text-xs">
-          <div className="font-bold text-foreground/80 border-b border-border pb-1.5 flex items-center gap-1.5">
+        <div className="mt-2.5 p-3 sm:p-4 rounded-xl border border-border bg-card/60 shadow-soft space-y-2 sm:space-y-2.5 max-w-full animate-reveal-up text-xs">
+          <div className="font-bold text-foreground/80 border-b border-border pb-1 flex items-center gap-1.5">
             <User className="h-4 w-4 text-primary" />
             Customer Profile
           </div>
@@ -421,36 +371,20 @@ export default function AIAssistantPage() {
   const hasMessages = messages.length > 0;
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-140px)] w-full max-w-4xl mx-auto relative px-2 sm:px-6">
-
-      {/* Top Header Controls (Minimalist inline bar) */}
-      <div className="flex justify-between items-center py-2 shrink-0 border-b border-border/10">
-
-        <div className="flex items-center gap-3">
-          {hasMessages && !isLoading && !isStreaming && (
-            <button
-              onClick={handleClearHistory}
-              title="Reset conversation"
-              className="p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors border border-border/20 bg-card/10"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
-          )}
-        </div>
-      </div>
+    <div className="flex flex-col h-[calc(100vh-115px)] md:h-[calc(100vh-130px)] w-full max-w-4xl mx-auto relative px-0 sm:px-6 -mb-6 md:-mb-8">
 
       {/* Main Console Viewports */}
       <div className="flex-1 flex flex-col justify-between relative min-h-0">
 
-        {/* Welcome State (Centered Gemini screen layout) */}
         {!hasMessages && !isLoading && !isStreaming ? (
+          /* Welcome State (Centered Gemini screen layout) */
           <div className="flex-1 flex flex-col justify-center items-center py-16 animate-fade-in text-center select-none">
-            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground/90 mb-10 leading-snug">
+            <h2 className="text-xl sm:text-4xl font-semibold tracking-tight text-foreground/90 mb-8 sm:mb-10 leading-snug max-w-md sm:max-w-2xl px-6 sm:px-4">
               How can I help manage your leads and bookings today?
             </h2>
 
             {/* Big Centered Input Box */}
-            <div className="w-full max-w-2xl px-4 space-y-4">
+            <div className="w-full max-w-4xl px-0.5 sm:px-1 space-y-4">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -469,9 +403,6 @@ export default function AIAssistantPage() {
                   placeholder="Ask anything..."
                   className="flex-1 min-w-0 bg-transparent border-0 px-2 py-1 text-sm focus:ring-0 focus:outline-none text-foreground"
                 />
-                <button type="button" className="text-muted-foreground/50 hover:text-foreground transition-colors p-1">
-                  <Mic className="h-5 w-5" />
-                </button>
                 <button
                   type="submit"
                   disabled={!inputText.trim() || isLoading || isStreaming}
@@ -482,14 +413,14 @@ export default function AIAssistantPage() {
               </form>
 
               {/* Grid Suggestion Chips */}
-              <div className="flex flex-wrap items-center justify-center gap-2.5 pt-4">
+              <div className="flex flex-wrap items-center justify-center gap-1.5 pt-3 sm:gap-2.5 sm:pt-4">
                 {starterPrompts.map((prompt, index) => (
                   <button
                     key={index}
                     onClick={() => handleSendMessage(prompt.text)}
-                    className="px-4 py-2 text-xs font-semibold text-foreground/80 bg-card border border-border hover:border-primary/40 hover:bg-muted/40 transition-all rounded-full cursor-pointer shadow-sm flex items-center gap-1.5"
+                    className="px-2 py-1 text-[10px] font-semibold text-foreground/80 bg-card border border-border hover:border-primary/40 hover:bg-muted/40 transition-all rounded-full cursor-pointer shadow-sm flex items-center gap-1 sm:px-4 sm:py-2 sm:text-xs sm:gap-1.5"
                   >
-                    <Sparkles className="h-3 w-3 text-primary" />
+                    <Sparkles className="h-2.5 w-2.5 text-primary sm:h-3 sm:w-3" />
                     {prompt.action}
                   </button>
                 ))}
@@ -499,39 +430,42 @@ export default function AIAssistantPage() {
         ) : (
 
           /* Conversations feed scroll viewport */
-          <div className="flex-1 overflow-y-auto space-y-7 py-6 px-1 pb-40 scrollbar-none">
+          <div className="flex-1 overflow-y-auto space-y-4 sm:space-y-7 py-3 sm:py-6 px-0.5 sm:px-1 scrollbar-none">
             {messages.map((message, i) => (
-              <div key={i} className="w-full flex flex-col space-y-1.5">
+              <div key={i} className="w-full flex flex-col space-y-1 sm:space-y-1.5">
 
                 {/* User message block */}
                 {message.role === "user" ? (
-                  <div className="flex justify-end w-full animate-reveal-up gap-3 items-end">
-                    <div className="bg-[#6366F1] text-white text-sm font-medium px-4 py-2.5 rounded-[20px] rounded-br-none max-w-[80%] shadow-sm">
-                      {message.content}
+                  <div className="flex flex-col items-end w-full space-y-1.5 bubble-pop">
+                    {/* User Header */}
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground/60 text-[10px] font-bold uppercase tracking-wider select-none pr-1">
+                      <span>You</span>
                     </div>
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-[#0088FF] to-[#8B5CF6] flex items-center justify-center text-white text-xs font-bold shadow-soft shrink-0 select-none">
-                      {userInitials}
+
+                    {/* User Response Bubble */}
+                    <div className="bg-[#6366F1] text-white text-sm font-medium px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-[20px] rounded-br-none max-w-[80%] shadow-sm">
+                      {message.content}
                     </div>
                   </div>
                 ) : (
 
                   /* Assistant message block (Clean bubble layout) */
-                  <div className="flex flex-col items-start w-full space-y-1.5 bubble-pop">
+                  <div className="flex flex-col items-start w-full space-y-1 sm:space-y-1.5 bubble-pop">
 
                     {/* Avatar header */}
-                    <div className="flex items-center gap-2 text-muted-foreground/60 text-[10px] font-bold uppercase tracking-wider select-none pl-1">
-                      <img src="/logo.png" alt="Logo" className="h-4.5 w-4.5 object-contain shrink-0" />
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-muted-foreground/60 text-[10px] font-bold uppercase tracking-wider select-none pl-1">
+                      <img src="/logo.png" alt="Logo" className="h-4 sm:h-4.5 w-4 sm:w-4.5 object-contain shrink-0" />
                       <span>Kai</span>
                     </div>
 
                     {/* Bot Response Bubble */}
-                    <div className="bg-muted text-foreground text-sm font-normal leading-relaxed px-4 py-2.5 rounded-[20px] rounded-bl-none max-w-[85%] shadow-sm whitespace-pre-wrap">
+                    <div className="bg-muted text-foreground text-sm font-normal leading-relaxed px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-[20px] rounded-bl-none max-w-[85%] shadow-sm whitespace-pre-wrap">
                       {message.content}
                     </div>
 
                     {/* Dynamic structured details cards */}
                     {message.data && (
-                      <div className="w-full max-w-[85%] pl-1">
+                      <div className="w-full max-w-[88%] sm:max-w-[85%] pl-0.5 sm:pl-1">
                         {renderDataCard(message.data)}
                       </div>
                     )}
@@ -589,18 +523,16 @@ export default function AIAssistantPage() {
           </div>
         )}
 
-        {/* Active Conversation Sticky Input Bar (Gemini bottom styled input) */}
-        {hasMessages && (
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/95 to-transparent pt-8 pb-4 shrink-0 pointer-events-none">
-            <div className="w-full space-y-3">
-
-
+        {/* Bottom Input Bar (Gemini styled input) */}
+        {(hasMessages || isLoading || isStreaming) && (
+          <div className="w-full pt-4 pb-2 shrink-0 bg-background px-0.5 sm:px-1">
+            <div className="w-full space-y-2.5">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleSendMessage(inputText);
                 }}
-                className="flex items-center gap-3 px-5 py-3 rounded-[30px] bg-muted/65 border border-border/50 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/40 transition-all shadow-soft pointer-events-auto"
+                className="w-full flex items-center gap-3 px-5 py-3 rounded-[30px] bg-muted/65 border border-border/50 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/40 transition-all shadow-soft"
               >
                 <button type="button" className="text-muted-foreground/50 hover:text-foreground transition-colors p-1 shrink-0">
                   <Plus className="h-4.5 w-4.5" />
@@ -613,9 +545,6 @@ export default function AIAssistantPage() {
                   placeholder="Ask anything..."
                   className="flex-1 min-w-0 bg-transparent border-0 px-2 py-1 text-sm focus:ring-0 focus:outline-none text-foreground placeholder:text-muted-foreground"
                 />
-                <button type="button" className="text-muted-foreground/50 hover:text-foreground transition-colors p-1 shrink-0">
-                  <Mic className="h-4.5 w-4.5" />
-                </button>
                 <button
                   type="submit"
                   disabled={!inputText.trim() || isLoading || isStreaming}
@@ -625,7 +554,7 @@ export default function AIAssistantPage() {
                 </button>
               </form>
 
-              <div className="flex justify-between items-center px-2 text-[10px] text-muted-foreground select-none pointer-events-auto">
+              <div className="hidden sm:flex justify-between items-center px-2 text-[10px] text-muted-foreground select-none">
                 <span>Organization context dynamically set to <span className="font-bold text-foreground">{currentOrg?.name || "Workspace"}</span></span>
                 <span className="font-mono text-[9px] bg-muted px-1.5 py-0.5 rounded border border-border/20">GMT+0530 Sync</span>
               </div>

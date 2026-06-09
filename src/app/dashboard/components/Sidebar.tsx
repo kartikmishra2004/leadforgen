@@ -55,18 +55,20 @@ export function Sidebar({ onSignOut, businessName, isCollapsed = false, setIsCol
 
   return (
     <>
-      {/* Mobile Toggle Button (only visible when sidebar is closed) */}
-      {!isOpen && (
-        <div className="lg:hidden fixed top-4 left-4 z-50">
-          <button
-            onClick={() => setIsOpen(true)}
-            className="p-2 rounded-lg bg-card border border-border shadow-soft text-foreground focus:outline-none"
-            aria-label="Open Sidebar"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-        </div>
-      )}
+      {/* Mobile Toggle Button */}
+      <div className={`lg:hidden fixed top-4 left-4 z-50 transition-all ease-in-out
+        ${isOpen 
+          ? "opacity-0 pointer-events-none scale-90 -translate-x-2 duration-0 delay-0" 
+          : "opacity-100 pointer-events-auto scale-100 translate-x-0 duration-300 delay-300"}`}
+      >
+        <button
+          onClick={() => setIsOpen(true)}
+          className="p-2 rounded-lg bg-card shadow-soft text-foreground focus:outline-none"
+          aria-label="Open Sidebar"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+      </div>
 
       {/* Sidebar Container */}
       <aside
